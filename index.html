@@ -1,462 +1,84 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal Phòng Kỹ thuật - Petrolimex Aviation</title>
-
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html, body {
-      width: 100%;
-      min-height: 100%;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-
-    body {
-      min-height: 100vh;
-      color: #0b2d66;
-      overflow-x: hidden;
-
-      background:
-        linear-gradient(
-          rgba(235, 246, 255, 0.76),
-          rgba(229, 242, 251, 0.72)
-        ),
-        url("./assets/img/airport-bg.png");
-
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
-    }
-
-    .portal {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* =========================
-       HEADER
-    ========================== */
-
-    .portal-header {
-      text-align: center;
-      padding: 54px 20px 24px;
-    }
-
-    .logo-wrap {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .company-logo {
-      width: min(520px, 82vw);
-      height: auto;
-      display: block;
-    }
-
-    .portal-title {
-      font-size: clamp(30px, 3vw, 48px);
-      line-height: 1.1;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      color: #0b2d66;
-      margin-top: 8px;
-    }
-
-    .portal-subtitle {
-      margin-top: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      font-size: 18px;
-      font-weight: 600;
-      color: #143f7a;
-    }
-
-    .portal-subtitle::before,
-    .portal-subtitle::after {
-      content: "";
-      width: 34px;
-      height: 3px;
-      border-radius: 999px;
-      background: #f58220;
-    }
-
-    /* =========================
-       MAIN
-    ========================== */
-
-    .portal-main {
-      flex: 1;
-      width: min(1320px, calc(100% - 40px));
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px 0 50px;
-    }
-
-    .module-grid {
-      width: 100%;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-    }
-
-    .module-card {
-      position: relative;
-      min-height: 180px;
-
-      display: flex;
-      align-items: center;
-      gap: 22px;
-
-      padding: 28px;
-
-      background: rgba(255, 255, 255, 0.94);
-      border: 1px solid rgba(255, 255, 255, 0.9);
-      border-radius: 18px;
-
-      text-decoration: none;
-      color: inherit;
-
-      box-shadow:
-        0 14px 32px rgba(17, 52, 94, 0.15);
-
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-
-      transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease,
-        border-color 0.2s ease;
-    }
-
-    .module-card::after {
-      content: "";
-      position: absolute;
-      left: 18px;
-      right: 18px;
-      bottom: 0;
-      height: 4px;
-      border-radius: 8px 8px 0 0;
-      background: #f58220;
-    }
-
-    .module-card:hover {
-      transform: translateY(-6px);
-      box-shadow:
-        0 20px 42px rgba(17, 52, 94, 0.22);
-
-      border-color: rgba(245, 130, 32, 0.45);
-    }
-
-    .module-icon {
-      width: 78px;
-      height: 78px;
-      flex: 0 0 78px;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      border-radius: 50%;
-
-      color: white;
-      font-size: 34px;
-      font-weight: 700;
-
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.3),
-        0 7px 18px rgba(0, 0, 0, 0.12);
-    }
-
-    .progress-icon {
-      background: linear-gradient(135deg, #1b6ed2, #1f4da1);
-    }
-
-    .loss-icon {
-      background: linear-gradient(135deg, #36b977, #17915d);
-    }
-
-    .measure-icon {
-      background: linear-gradient(135deg, #7651db, #552fc5);
-    }
-
-    .module-content {
-      min-width: 0;
-      flex: 1;
-    }
-
-    .module-title {
-      font-size: 19px;
-      line-height: 1.35;
-      font-weight: 800;
-      color: #0b2d66;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-    }
-
-    .module-desc {
-      font-size: 14px;
-      line-height: 1.65;
-      color: #4f6177;
-    }
-
-    .module-arrow {
-      flex: 0 0 auto;
-      font-size: 30px;
-      color: #466887;
-      transition: transform 0.2s ease;
-    }
-
-    .module-card:hover .module-arrow {
-      transform: translateX(4px);
-      color: #f58220;
-    }
-
-    /* =========================
-       FOOTER
-    ========================== */
-
-    .portal-footer {
-      width: 100%;
-      padding: 18px 20px 22px;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-
-      color: #ffffff;
-      font-size: 13px;
-      font-weight: 600;
-
-      background: rgba(9, 39, 82, 0.75);
-      backdrop-filter: blur(4px);
-    }
-
-    .footer-icon {
-      opacity: 0.9;
-    }
-
-    /* =========================
-       RESPONSIVE
-    ========================== */
-
-    @media (max-width: 1050px) {
-      .module-grid {
-        grid-template-columns: 1fr;
-        max-width: 720px;
-        margin: 0 auto;
-      }
-
-      .module-card {
-        min-height: 150px;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .portal-header {
-        padding-top: 34px;
-      }
-
-      .portal-main {
-        width: min(100% - 24px, 1320px);
-        padding-top: 10px;
-      }
-
-      .module-card {
-        padding: 22px 18px;
-        gap: 16px;
-      }
-
-      .module-icon {
-        width: 62px;
-        height: 62px;
-        flex-basis: 62px;
-        font-size: 28px;
-      }
-
-      .module-title {
-        font-size: 16px;
-      }
-
-      .module-desc {
-        font-size: 13px;
-      }
-
-      .module-arrow {
-        font-size: 24px;
-      }
-
-      .portal-subtitle {
-        font-size: 15px;
-      }
-    }
+    :root{--navy:#082b68;--orange:#f58220;--blue:#1f69d5;--green:#17a36a;--purple:#7447d8;--text:#0d2d64;--muted:#46586f}
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{width:100%;min-height:100%}
+    body{min-height:100vh;font-family:"Segoe UI",Arial,"Helvetica Neue",Helvetica,sans-serif;color:var(--text);background:#dff1ff;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+    .portal{position:relative;min-height:100vh;display:flex;flex-direction:column;isolation:isolate;overflow:hidden;background:linear-gradient(180deg,rgba(231,246,255,.80) 0%,rgba(235,247,255,.45) 32%,rgba(227,242,252,.15) 60%,rgba(219,235,246,.04) 100%),url("./assets/img/airport-bg.png") center bottom/cover no-repeat}
+    .portal::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 50% 7%,rgba(255,255,255,.95),rgba(255,255,255,.18) 35%,transparent 58%)}
+    .page-shell{width:min(1180px,calc(100% - 44px));margin:0 auto}
+    .hero{text-align:center;padding:30px 0 14px}
+    .brand-logo{display:block;width:min(500px,72vw);max-height:120px;object-fit:contain;margin:0 auto 8px}
+    .hero h1{font-size:clamp(32px,4.2vw,58px);line-height:1.05;font-weight:800;letter-spacing:.015em;color:var(--navy);text-transform:uppercase;text-shadow:0 2px 0 rgba(255,255,255,.65)}
+    .subtitle{margin-top:10px;display:flex;justify-content:center;align-items:center;gap:16px;font-size:clamp(17px,2vw,27px);font-weight:700;color:#143c7c}
+    .subtitle::before,.subtitle::after{content:"";width:38px;height:3px;border-radius:999px;background:var(--orange)}
+    .modules-wrap{flex:1;display:flex;align-items:center;padding:16px 0 42px}
+    .modules{width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:28px;align-items:stretch}
+    .module-card{--accent:var(--blue);position:relative;min-height:390px;padding:30px 26px 25px;display:flex;flex-direction:column;align-items:center;text-align:center;color:var(--text);text-decoration:none;background:rgba(255,255,255,.95);border:1px solid rgba(255,255,255,.92);border-radius:24px;box-shadow:0 18px 45px rgba(18,50,92,.18),0 3px 9px rgba(18,50,92,.08);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:transform .22s ease,box-shadow .22s ease}
+    .module-card::after{content:"";position:absolute;left:20px;right:20px;bottom:-1px;height:6px;border-radius:0 0 20px 20px;background:var(--accent)}
+    .module-card:hover{transform:translateY(-7px);box-shadow:0 24px 55px rgba(18,50,92,.24),0 5px 12px rgba(18,50,92,.10)}
+    .card-progress{--accent:var(--blue)}.card-loss{--accent:var(--green)}.card-meter{--accent:var(--purple)}
+    .icon-circle{width:114px;height:114px;flex:0 0 114px;display:grid;place-items:center;margin-bottom:21px;border-radius:50%;color:#fff;background:radial-gradient(circle at 30% 24%,rgba(255,255,255,.20),transparent 28%),var(--accent);box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 9px 20px rgba(16,50,95,.15)}
+    .icon-circle svg{width:58px;height:58px;stroke:currentColor}
+    .module-title{min-height:62px;display:flex;align-items:center;justify-content:center;font-size:clamp(19px,1.65vw,28px);line-height:1.2;font-weight:800;color:var(--navy);text-transform:uppercase}
+    .title-line{width:42px;height:3px;margin:16px auto 18px;border-radius:999px;background:var(--accent)}
+    .module-desc{min-height:78px;max-width:290px;font-size:15px;line-height:1.55;font-weight:500;color:#35465c}
+    .arrow-button{width:54px;height:54px;margin-top:auto;display:grid;place-items:center;border:2px solid var(--accent);border-radius:50%;color:var(--accent);background:rgba(255,255,255,.75);transition:color .2s ease,background .2s ease,transform .2s ease}
+    .module-card:hover .arrow-button{color:#fff;background:var(--accent);transform:translateX(3px)}
+    .arrow-button svg{width:26px;height:26px;stroke:currentColor}
+    .footer-wrap{padding:0 28px 18px}
+    .footer{width:min(1460px,100%);margin:0 auto;padding:16px 24px 14px;border-radius:24px 24px 0 0;color:#fff;text-align:center;background:rgba(4,44,99,.93);box-shadow:0 -5px 20px rgba(8,43,93,.16);backdrop-filter:blur(8px)}
+    .footer-main{display:flex;justify-content:center;align-items:center;gap:10px;font-size:clamp(14px,1.3vw,19px);font-weight:700}
+    .footer-main svg{width:22px;height:22px;stroke:#fff}.footer-sub{margin-top:8px;color:rgba(255,255,255,.82);font-size:12px;font-weight:500}
+    @media(max-width:980px){.modules{grid-template-columns:1fr;max-width:620px;margin:0 auto}.module-card{min-height:320px}.module-title,.module-desc{min-height:auto}}
+    @media(max-width:600px){.page-shell{width:min(100% - 24px,1180px)}.hero{padding-top:24px}.brand-logo{width:min(390px,94vw)}.hero h1{font-size:30px}.subtitle{font-size:16px;gap:10px}.subtitle::before,.subtitle::after{width:22px}.modules-wrap{padding-top:10px}.modules{gap:18px}.module-card{min-height:300px;border-radius:18px}.icon-circle{width:92px;height:92px;flex-basis:92px}.icon-circle svg{width:47px;height:47px}.module-title{font-size:21px}.footer-wrap{padding:0}.footer{border-radius:0}}
   </style>
 </head>
-
 <body>
-
   <div class="portal">
-
-    <!-- =========================
-         HEADER
-    ========================== -->
-    <header class="portal-header">
-
-      <!--
-        Đặt ảnh logo bạn gửi vào:
-        assets/img/petrolimex-aviation-logo.jpg
-
-        Nếu tên file khác, sửa src bên dưới.
-      -->
-      <div class="logo-wrap">
-        <img
-          src="./assets/img/petrolimex-aviation-logo.jpg"
-          alt="Petrolimex Nhiên liệu bay"
-          class="company-logo"
-        />
-      </div>
-
-      <h1 class="portal-title">
-        PORTAL PHÒNG KỸ THUẬT
-      </h1>
-
-      <div class="portal-subtitle">
-        Petrolimex Aviation
-      </div>
-
-    </header>
-
-
-    <!-- =========================
-         3 MODULE CHÍNH
-    ========================== -->
-    <main class="portal-main">
-
-      <div class="module-grid">
-
-        <!-- QUẢN LÝ TIẾN ĐỘ -->
-        <a
-          href="./tien-do/"
-          class="module-card"
-          title="Mở hệ thống quản lý tiến độ công việc"
-        >
-
-          <div class="module-icon progress-icon">
-            ✓
-          </div>
-
-          <div class="module-content">
-
-            <h2 class="module-title">
-              Theo dõi tiến độ công việc
-            </h2>
-
-            <p class="module-desc">
-              Quản lý và theo dõi tiến độ công việc,
-              kế hoạch tuần và người phụ trách.
-            </p>
-
-          </div>
-
-          <div class="module-arrow">
-            →
-          </div>
-
-        </a>
-
-
-        <!-- QUẢN LÝ HAO HỤT -->
-        <a
-          href="./hao-hut/"
-          class="module-card"
-          title="Mở hệ thống quản lý số lượng và hao hụt"
-        >
-
-          <div class="module-icon loss-icon">
-            ▥
-          </div>
-
-          <div class="module-content">
-
-            <h2 class="module-title">
-              Tổng hợp hao hụt
-            </h2>
-
-            <p class="module-desc">
-              Theo dõi và tổng hợp số liệu hao hụt
-              hàng ngày theo chi nhánh và định mức.
-            </p>
-
-          </div>
-
-          <div class="module-arrow">
-            →
-          </div>
-
-        </a>
-
-
-        <!-- QUẢN LÝ PTĐ -->
-        <a
-          href="./ptd/"
-          class="module-card"
-          title="Mở hệ thống quản lý phương tiện đo"
-        >
-
-          <div class="module-icon measure-icon">
-            ◴
-          </div>
-
-          <div class="module-content">
-
-            <h2 class="module-title">
-              Quản lý phương tiện đo
-            </h2>
-
-            <p class="module-desc">
-              Quản lý phương tiện đo, kiểm định,
-              hiệu chuẩn và theo dõi thời hạn.
-            </p>
-
-          </div>
-
-          <div class="module-arrow">
-            →
-          </div>
-
-        </a>
-
-      </div>
-
-    </main>
-
-
-    <!-- =========================
-         FOOTER
-    ========================== -->
-    <footer class="portal-footer">
-      <span class="footer-icon">◇</span>
-      <span>
-        PHÒNG KỸ THUẬT – PETROLIMEX AVIATION
-      </span>
-    </footer>
-
+    <div class="page-shell">
+      <header class="hero">
+        <img src="./assets/img/petrolimex-aviation-logo.png" alt="Petrolimex Nhiên liệu bay" class="brand-logo">
+        <h1>Portal Phòng Kỹ thuật</h1>
+        <div class="subtitle">Petrolimex Aviation</div>
+      </header>
+      <main class="modules-wrap">
+        <section class="modules" aria-label="Các ứng dụng Phòng Kỹ thuật">
+          <a href="./tien-do/" class="module-card card-progress">
+            <div class="icon-circle" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><rect x="15" y="12" width="34" height="43" rx="4"></rect><path d="M25 12V8h14v4"></path><path d="M23 27l4 4 7-8"></path><path d="M23 40l4 4 7-8"></path><path d="M38 29h5"></path><path d="M38 42h5"></path></svg></div>
+            <h2 class="module-title">Theo dõi<br>tiến độ công việc</h2>
+            <div class="title-line"></div>
+            <p class="module-desc">Quản lý và theo dõi tiến độ công việc, kế hoạch tuần và người phụ trách.</p>
+            <div class="arrow-button" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m14 7 5 5-5 5"></path></svg></div>
+          </a>
+          <a href="./hao-hut/" class="module-card card-loss">
+            <div class="icon-circle" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 52h40"></path><rect x="16" y="35" width="8" height="17" rx="1"></rect><rect x="28" y="26" width="8" height="26" rx="1"></rect><rect x="40" y="16" width="8" height="36" rx="1"></rect></svg></div>
+            <h2 class="module-title">Tổng hợp<br>hao hụt</h2>
+            <div class="title-line"></div>
+            <p class="module-desc">Theo dõi và tổng hợp số liệu hao hụt hàng ngày theo chi nhánh và định mức.</p>
+            <div class="arrow-button" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m14 7 5 5-5 5"></path></svg></div>
+          </a>
+          <a href="./ptd/" class="module-card card-meter">
+            <div class="icon-circle" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M11 43a21 21 0 1 1 42 0"></path><path d="M18 43h28"></path><path d="M32 22v5"></path><path d="M20 28l4 4"></path><path d="M44 28l-4 4"></path><path d="m32 41 10-11"></path><circle cx="32" cy="41" r="2"></circle></svg></div>
+            <h2 class="module-title">Quản lý<br>phương tiện đo</h2>
+            <div class="title-line"></div>
+            <p class="module-desc">Quản lý phương tiện đo, kiểm định, hiệu chuẩn và theo dõi thời hạn.</p>
+            <div class="arrow-button" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m14 7 5 5-5 5"></path></svg></div>
+          </a>
+        </section>
+      </main>
+    </div>
+    <div class="footer-wrap">
+      <footer class="footer">
+        <div class="footer-main"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v5c0 5 3 8 7 10 4-2 7-5 7-10V6l-7-3Z"></path><path d="m9 12 2 2 4-5"></path></svg><span>PHÒNG KỸ THUẬT – PETROLIMEX AVIATION</span></div>
+        <div class="footer-sub">An toàn – Chính xác – Hiệu quả – Phát triển bền vững</div>
+      </footer>
+    </div>
   </div>
-
 </body>
 </html>

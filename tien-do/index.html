@@ -1,1 +1,1184 @@
-<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Quản lý tiến độ công việc</title><style>body{margin:0;font-family:Arial,sans-serif;background:#f3f6fb;color:#153052}.wrap{max-width:900px;margin:70px auto;padding:30px}.card{background:#fff;border:1px solid #dfe6ef;border-radius:16px;padding:36px;box-shadow:0 8px 25px rgba(20,40,80,.08)}a{display:inline-block;margin-top:24px;background:#0d469d;color:#fff;text-decoration:none;padding:12px 18px;border-radius:9px}code{background:#edf2f7;padding:3px 6px;border-radius:5px}</style></head><body><div class="wrap"><div class="card"><h1>Quản lý tiến độ công việc</h1><p>Đây là file giữ chỗ để project GitHub chạy ngay.</p><p>Hãy thay file <code>tien-do/index.html</code> bằng trang HTML riêng mà bạn đã xây cho mảng này.</p><a href="../">← Quay về Cổng PKT</a></div></div></body></html>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Theo dõi tiến độ công việc PKT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+:root{
+  --background:#f3f6fa; --card:#ffffff; --navy:#123b68; --navy-2:#0d2d52;
+  --blue:#1769d2; --green:#20a464; --orange:#f59e0b; --red:#dc3545;
+  --text:#17324d; --muted:#718096; --border:#dfe6ee;
+  --navy-hi:#1c4f8a; --amber:#f59e0b;
+  --green-bg:#e4f6ed; --orange-bg:#fdf0d9; --blue-bg:#e3effc; --red-bg:#fbe4e6; --gray-bg:#eef2f7;
+  --shadow:0 3px 12px rgba(20,40,80,0.08);
+  --shadow-lg:0 12px 40px rgba(20,40,80,0.18);
+  --sidebar-w:230px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,Arial,sans-serif;
+  background:var(--background);color:var(--text);font-size:14px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+.mono{font-variant-numeric:tabular-nums}
+button{font-family:inherit;cursor:pointer}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:#c5d0dc;border-radius:6px;border:2px solid var(--background)}
+::-webkit-scrollbar-thumb:hover{background:#a9b7c6}
+
+/* ── Layout ── */
+.app{display:flex;min-height:100vh}
+.sidebar{
+  width:var(--sidebar-w);background:linear-gradient(180deg,var(--navy),var(--navy-2));
+  color:#cdddf0;position:fixed;top:0;left:0;bottom:0;z-index:50;display:flex;flex-direction:column;
+  padding:0;
+}
+.sb-logo{display:flex;align-items:center;gap:11px;padding:20px 20px 22px}
+.sb-logo .mk{
+  width:40px;height:40px;border-radius:9px;background:rgba(255,255,255,.1);border:2px solid var(--amber);
+  display:grid;place-items:center;font-weight:800;color:var(--amber);font-size:14px;flex-shrink:0;
+}
+.sb-logo .tt{font-size:14.5px;font-weight:700;color:#fff;line-height:1.25}
+.sb-nav{flex:1;padding:6px 12px;display:flex;flex-direction:column;gap:2px}
+.sb-item{
+  display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:9px;color:#a9c2dc;
+  font-size:13.5px;font-weight:500;border:none;background:none;width:100%;text-align:left;
+  transition:.15s;position:relative;
+}
+.sb-item svg{width:18px;height:18px;flex-shrink:0;stroke-width:2}
+.sb-item:hover{background:rgba(255,255,255,.07);color:#e8f1fb}
+.sb-item.on{background:var(--navy-hi);color:#fff;font-weight:600}
+.sb-item.on::before{content:"";position:absolute;left:-12px;top:6px;bottom:6px;width:4px;background:var(--amber);border-radius:0 3px 3px 0}
+.sb-foot{padding:16px 20px;font-size:11px;color:#6f8bab;border-top:1px solid rgba(255,255,255,.08)}
+
+.main{margin-left:var(--sidebar-w);flex:1;min-width:0;display:flex;flex-direction:column}
+
+/* ── Header ── */
+.topbar{
+  background:var(--card);border-bottom:1px solid var(--border);padding:0 26px;
+  position:sticky;top:0;z-index:40;
+}
+.topbar-row{display:flex;align-items:center;gap:12px;height:64px;flex-wrap:nowrap;min-width:0}
+.topbar h1{font-size:19px;font-weight:700;color:var(--navy);letter-spacing:-.2px;white-space:nowrap;flex-shrink:0}
+.topbar .sp{flex:1}
+.icon-btn{
+  width:38px;height:38px;border-radius:9px;border:1px solid var(--border);background:#fff;
+  display:grid;place-items:center;color:var(--muted);position:relative;transition:.15s;
+}
+.icon-btn:hover{background:var(--gray-bg);color:var(--navy)}
+.icon-btn svg{width:18px;height:18px}
+.badge-dot{position:absolute;top:7px;right:8px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid #fff}
+.user-chip{display:flex;align-items:center;gap:9px;padding:5px 6px 5px 12px;border:1px solid var(--border);border-radius:22px;background:#fff}
+.user-chip .nm{font-size:12.5px;font-weight:600;color:var(--text)}
+.user-chip .av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--navy));display:grid;place-items:center;color:#fff;font-size:12px;font-weight:700}
+
+.filterbar{display:flex;align-items:center;gap:10px;padding:13px 0;flex-wrap:wrap}
+.search-box{position:relative;flex:1;min-width:200px;max-width:360px}
+.search-box svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted)}
+.search-box input{width:100%;padding:9px 12px 9px 36px;border:1px solid var(--border);border-radius:9px;font-size:13px;font-family:inherit;background:#fbfcfe;color:var(--text)}
+.search-box input:focus{outline:none;border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(23,105,210,.1)}
+.sel{padding:9px 12px;border:1px solid var(--border);border-radius:9px;font-size:12.5px;font-family:inherit;background:#fbfcfe;color:var(--text);cursor:pointer;min-width:auto}
+.sel:focus{outline:none;border-color:var(--blue)}
+.btn{padding:9px 16px;border:none;border-radius:9px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:7px;transition:.15s}
+.btn svg{width:16px;height:16px}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:#1259b8}
+.btn-ghost{background:#fff;border:1px solid var(--border);color:var(--text)}
+.btn-ghost:hover{background:var(--gray-bg)}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-navy:hover{background:var(--navy-2)}
+
+/* ── Content ── */
+.content{padding:22px 26px 60px;flex:1}
+.page{display:none}
+.page.on{display:block;animation:fade .2s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.page-title{font-size:17px;font-weight:700;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.page-title .sub{font-size:12.5px;font-weight:500;color:var(--muted)}
+
+/* ── KPI cards ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:24px}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.kpi-card .ico{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;margin-bottom:12px}
+.kpi-card .ico svg{width:18px;height:18px}
+.kpi-card .n{font-size:26px;font-weight:800;line-height:1;letter-spacing:-.5px}
+.kpi-card .l{font-size:12px;color:var(--muted);margin-top:5px;font-weight:500}
+.kpi-card .delta{font-size:11px;font-weight:600;margin-top:6px;display:inline-flex;align-items:center;gap:3px}
+.k-total .ico{background:var(--gray-bg);color:var(--navy)}
+.k-total .n{color:var(--navy)}
+.k-done .ico{background:var(--green-bg);color:var(--green)} .k-done .n{color:var(--green)}
+.k-prog .ico{background:var(--orange-bg);color:var(--orange)} .k-prog .n{color:var(--orange)}
+.k-plan .ico{background:var(--blue-bg);color:var(--blue)} .k-plan .n{color:var(--blue)}
+.k-late .ico{background:var(--red-bg);color:var(--red)} .k-late .n{color:var(--red)}
+.k-rate .ico{background:#ede9fe;color:#7c3aed} .k-rate .n{color:#7c3aed}
+.delta.up{color:var(--green)} .delta.down{color:var(--red)} .delta.flat{color:var(--muted)}
+
+/* ── Section card ── */
+.sec{background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);margin-bottom:20px}
+.sec-head{padding:15px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sec-head h3{font-size:14.5px;font-weight:700;color:var(--navy)}
+.sec-body{padding:18px 20px}
+
+/* ── Table (Danh sách) ── */
+.tbl-wrap{overflow-x:auto}
+table.list{width:100%;border-collapse:collapse;font-size:13px}
+table.list thead th{
+  text-align:left;padding:11px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--muted);font-weight:700;border-bottom:2px solid var(--border);white-space:nowrap;background:#fafcfe;
+}
+table.list tbody td{padding:12px 14px;border-bottom:1px solid #eef2f7;vertical-align:top}
+table.list tbody tr{transition:.12s;cursor:pointer}
+table.list tbody tr:hover{background:#f7fafd}
+.td-stt{width:38px;color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+.td-title{font-weight:600;color:var(--text);max-width:340px}
+.td-title .cat-mini{font-size:11px;color:var(--muted);font-weight:500;margin-top:2px}
+
+/* ── Excel-style grid table ── */
+.view-toggle{display:inline-flex;background:#eef2f7;border-radius:8px;padding:3px;gap:2px}
+.view-toggle button{padding:6px 13px;border:none;background:transparent;border-radius:6px;font-size:12.5px;font-weight:600;color:var(--muted);font-family:inherit}
+.view-toggle button.on{background:#fff;color:var(--navy);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.xls-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+table.xls{width:100%;border-collapse:collapse;font-size:12.5px;min-width:1100px}
+table.xls th{
+  background:var(--navy);color:#fff;font-weight:600;font-size:11.5px;padding:10px 12px;
+  text-align:left;border-right:1px solid rgba(255,255,255,.12);white-space:nowrap;position:sticky;top:0;z-index:3;
+}
+table.xls th:first-child{position:sticky;left:0;z-index:5}
+table.xls th.col-nd{position:sticky;left:44px;z-index:5;min-width:240px}
+table.xls td{
+  padding:9px 12px;border:1px solid #e5ebf2;vertical-align:top;line-height:1.45;
+}
+table.xls tbody tr:hover td{background:#f7fafd}
+table.xls .mang-row td{background:#eef3f8;font-weight:700;color:var(--navy);font-size:12px;text-transform:uppercase;letter-spacing:.3px;padding:8px 12px}
+.xls .c-stt{width:44px;text-align:center;color:var(--muted);font-weight:700;position:sticky;left:0;background:#fff;z-index:2}
+.xls .c-nd{position:sticky;left:44px;background:#fff;z-index:2;min-width:240px;max-width:280px;font-weight:600;color:var(--text)}
+.xls tbody tr:hover .c-stt,.xls tbody tr:hover .c-nd{background:#f7fafd}
+.xls .c-who{white-space:nowrap;width:90px}
+.xls .c-week{min-width:210px;max-width:260px;font-size:12px;color:#3a5064;white-space:pre-wrap}
+.xls .c-plan{min-width:200px;max-width:250px;font-size:12px;background:#f2f9f4;white-space:pre-wrap}
+.wk-badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:10.5px;font-weight:700;margin-bottom:5px}
+.wk-cell-empty{color:#c5cfd9;text-align:center}
+.xls-edit{cursor:pointer}
+.xls-edit:hover{background:#fff8e8}
+.cat-tag{display:inline-block;padding:3px 10px;border-radius:16px;font-size:11px;font-weight:600;background:var(--gray-bg);color:var(--navy);white-space:nowrap}
+.who-tag{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500}
+.who-tag .av{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--navy));color:#fff;display:grid;place-items:center;font-size:10px;font-weight:700}
+.status-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:16px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.status-badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.sb-done{background:var(--green-bg);color:var(--green)}
+.sb-progress{background:var(--orange-bg);color:#b7791f}
+.sb-plan{background:var(--blue-bg);color:var(--blue)}
+.sb-late{background:var(--red-bg);color:var(--red)}
+.sb-pause{background:var(--gray-bg);color:var(--muted)}
+.mini-prog{display:flex;align-items:center;gap:8px;min-width:110px}
+.mini-prog .track{flex:1;height:6px;background:#e8eef5;border-radius:10px;overflow:hidden}
+.mini-prog .fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--blue),var(--green))}
+.mini-prog .pv{font-size:11.5px;font-weight:700;color:var(--navy);min-width:32px;text-align:right}
+.td-date{font-size:12.5px;color:var(--muted);white-space:nowrap}
+
+/* ── Detail panel (drawer) ── */
+.drawer-bg{position:fixed;inset:0;background:rgba(13,27,42,.4);z-index:90;opacity:0;pointer-events:none;transition:.2s}
+.drawer-bg.on{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;right:0;bottom:0;width:520px;max-width:94vw;background:#fff;z-index:95;
+  transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;box-shadow:var(--shadow-lg);
+}
+.drawer.on{transform:none}
+.drawer-head{padding:20px 22px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px}
+.drawer-head .num{width:32px;height:32px;border-radius:8px;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;flex-shrink:0}
+.drawer-head h2{font-size:16px;font-weight:700;color:var(--text);line-height:1.35;flex:1}
+.drawer-body{flex:1;overflow-y:auto;padding:20px 22px}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px}
+.meta-grid .mi .ml{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700;margin-bottom:3px}
+.meta-grid .mi .mv{font-size:13px;font-weight:600;color:var(--text)}
+.desc-box{background:var(--gray-bg);border-radius:10px;padding:13px 15px;font-size:13px;line-height:1.55;color:var(--text);margin-bottom:20px;white-space:pre-wrap}
+.tl-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:14px;text-transform:uppercase;letter-spacing:.4px}
+
+/* Timeline */
+.timeline{position:relative;padding-left:26px}
+.timeline::before{content:"";position:absolute;left:7px;top:6px;bottom:10px;width:2px;background:var(--border)}
+.tl-item{position:relative;margin-bottom:20px}
+.tl-item::before{content:"";position:absolute;left:-26px;top:2px;width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--muted)}
+.tl-item.done::before{border-color:var(--green)}
+.tl-item.progress::before{border-color:var(--orange)}
+.tl-item.plan::before{border-color:var(--blue)}
+.tl-item.next::before{border-color:var(--blue);background:var(--blue)}
+.tl-week{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+.tl-week .wk{font-size:13px;font-weight:700;color:var(--text)}
+.tl-body{font-size:12.5px;line-height:1.55;color:#3a5064}
+.tl-body ul{list-style:none;padding:0}
+.tl-body li{padding-left:15px;position:relative;margin-bottom:3px}
+.tl-body li::before{content:"–";position:absolute;left:0;color:var(--muted)}
+.tl-issues{margin-top:6px;padding:7px 10px;background:var(--red-bg);border-radius:7px;font-size:12px;color:#a02734}
+.tl-next{margin-top:6px;padding:7px 10px;background:var(--blue-bg);border-radius:7px;font-size:12px;color:#155aa8}
+.cmt-box{margin-top:8px;padding:9px 12px;background:#fdf6e9;border-left:3px solid var(--amber);border-radius:0 8px 8px 0;font-size:12px;color:#8a6d29;font-style:italic}
+.drawer-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:10px}
+
+/* ── Kanban ── */
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:start}
+.kcol{background:#eef2f7;border-radius:12px;padding:12px;min-height:200px}
+.kcol.drag-over{background:#e0e9f4;outline:2px dashed var(--blue)}
+.kcol-head{display:flex;align-items:center;gap:8px;padding:4px 6px 12px;font-weight:700;font-size:13.5px}
+.kcol-head .dot{width:9px;height:9px;border-radius:50%}
+.kcol-head .cnt{margin-left:auto;background:#fff;color:var(--muted);font-size:11px;padding:2px 9px;border-radius:12px;font-weight:700}
+.kcol.c-plan .dot{background:var(--blue)} .kcol.c-progress .dot{background:var(--orange)}
+.kcol.c-done .dot{background:var(--green)} .kcol.c-late .dot{background:var(--red)}
+.kcard{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 13px;margin-bottom:10px;box-shadow:0 1px 3px rgba(20,40,80,.06);cursor:grab;transition:.12s}
+.kcard:hover{box-shadow:0 4px 12px rgba(20,40,80,.12);transform:translateY(-1px)}
+.kcard.dragging{opacity:.5;cursor:grabbing}
+.kcard .kt{font-size:13px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:8px}
+.kcard .kmeta{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:var(--muted)}
+.kcard .kcat{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:12px;background:var(--gray-bg);color:var(--navy);font-weight:600;margin-bottom:8px}
+.kcard .kfoot{display:flex;align-items:center;justify-content:space-between;margin-top:9px;padding-top:9px;border-top:1px solid #eef2f7}
+.kcard .kwho{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;color:var(--text)}
+.kcard .kwho .av{width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--navy));color:#fff;display:grid;place-items:center;font-size:9px;font-weight:700}
+.kcard .kprog{font-size:11px;font-weight:700;color:var(--navy)}
+.prio-flag{font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px}
+.prio-high{background:var(--red-bg);color:var(--red)} .prio-normal{background:var(--gray-bg);color:var(--muted)}
+
+/* ── Calendar ── */
+.cal-head{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.cal-head .mtitle{font-size:16px;font-weight:700;color:var(--navy);min-width:150px;text-align:center}
+.cal-nav{display:flex;gap:6px}
+.cal-nav button{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:#fff;display:grid;place-items:center;color:var(--navy)}
+.cal-nav button:hover{background:var(--gray-bg)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-dow{text-align:center;font-size:11px;font-weight:700;color:var(--muted);padding:6px 0;text-transform:uppercase}
+.cal-dow.sun,.cal-dow.sat{color:var(--red)}
+.cal-cell{background:#fff;border:1px solid var(--border);border-radius:9px;min-height:92px;padding:7px 8px;font-size:12px}
+.cal-cell.other{background:#f7f9fc;color:var(--ghost)}
+.cal-cell .dn{font-weight:700;color:var(--text);margin-bottom:4px}
+.cal-cell.today .dn{background:var(--blue);color:#fff;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11px}
+.cal-ev{font-size:10.5px;padding:2px 6px;border-radius:5px;margin-bottom:3px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+.ev-done{background:var(--green-bg);color:var(--green)} .ev-progress{background:var(--orange-bg);color:#b7791f}
+.ev-plan{background:var(--blue-bg);color:var(--blue)} .ev-late{background:var(--red-bg);color:var(--red)}
+
+/* ── Reports ── */
+.rep-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.bar-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.bar-row .bl{width:150px;font-size:12.5px;font-weight:600;color:var(--text);text-align:right;flex-shrink:0}
+.bar-row .btrack{flex:1;height:24px;background:var(--gray-bg);border-radius:6px;overflow:hidden;position:relative}
+.bar-row .bfill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:#fff;font-size:11px;font-weight:700;min-width:28px}
+.person-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.person-tbl th{text-align:left;padding:9px 12px;font-size:11px;text-transform:uppercase;color:var(--muted);font-weight:700;border-bottom:2px solid var(--border)}
+.person-tbl td{padding:10px 12px;border-bottom:1px solid #eef2f7}
+.person-tbl .num{text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+.trend-chart{height:220px;display:flex;align-items:flex-end;gap:auto;justify-content:space-around;padding:16px 8px 0}
+.trend-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
+.trend-bars{display:flex;align-items:flex-end;gap:4px;height:170px}
+.trend-bars .tb{width:16px;border-radius:4px 4px 0 0;transition:.3s}
+.trend-lbl{font-size:11px;color:var(--muted);font-weight:600}
+
+/* ── Modal ── */
+.modal-bg{position:fixed;inset:0;background:rgba(13,27,42,.5);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-bg.on{display:flex}
+.modal{background:#fff;border-radius:14px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+.modal-head{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:2}
+.modal-head h3{font-size:15.5px;font-weight:700;color:var(--navy)}
+.x{background:none;border:none;font-size:24px;color:var(--muted);line-height:1;padding:0 4px}
+.x:hover{color:var(--text)}
+.modal-body{padding:20px 22px}
+.modal-foot{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:#fff}
+.field{margin-bottom:15px}
+.field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.4px;font-weight:700;color:var(--text);margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:9px;font-size:13px;font-family:inherit;background:#fbfcfe;color:var(--text)}
+.field textarea{resize:vertical;min-height:64px;line-height:1.5}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(23,105,210,.1)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(90px);background:var(--navy);color:#fff;padding:11px 22px;border-radius:30px;font-size:13px;font-weight:600;box-shadow:var(--shadow-lg);transition:transform .3s;z-index:120}
+.toast.on{transform:translateX(-50%) translateY(0)}
+.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty .big{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px}
+
+@media(max-width:1200px){
+  .kpi-grid{grid-template-columns:repeat(3,1fr)}
+  .kanban{grid-template-columns:repeat(2,1fr)}
+  .rep-grid{grid-template-columns:1fr}
+}
+/* Chế độ Xem: ẩn mọi nút chỉnh sửa */
+body.view-only .admin-only{display:none !important}
+body.view-only #drawer .drawer-foot .btn-primary,
+body.view-only #drawer .drawer-foot .btn-navy{display:none !important}
+body.view-only .xls-edit{cursor:default}
+.view-banner{display:none}
+body.view-only .view-banner{display:flex;align-items:center;gap:8px;background:#eef3f8;color:var(--navy);padding:8px 26px;font-size:12.5px;border-bottom:1px solid var(--border)}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo"><div class="mk">PKT</div><div class="tt">Theo dõi tiến độ<br>công việc</div></div>
+    <nav class="sb-nav">
+      <button class="sb-item" data-page="dashboard" onclick="goto('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Tổng quan</button>
+      <button class="sb-item" data-page="list" onclick="goto('list')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Danh sách công việc</button>
+      <button class="sb-item" data-page="kanban" onclick="goto('kanban')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="6" height="18"/><rect x="10" y="3" width="6" height="12"/><rect x="17" y="3" width="4" height="9"/></svg>Bảng Kanban</button>
+      <button class="sb-item" data-page="calendar" onclick="goto('calendar')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Lịch công việc</button>
+      <button class="sb-item" data-page="reports" onclick="goto('reports')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Báo cáo</button>
+      <button class="sb-item" data-page="docs" onclick="goto('docs')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Tài liệu</button>
+      <button class="sb-item" data-page="remind" onclick="goto('remind')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>Nhắc việc</button>
+      <button class="sb-item" data-page="settings" onclick="goto('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Cài đặt</button>
+    </nav>
+    <div class="sb-foot">Bản demo · Dữ liệu lưu cục bộ<br>PKT · Skypec 2026</div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-row">
+        <h1>Theo dõi tiến độ công việc PKT</h1>
+        <div class="sp" style="flex:1"></div>
+        <button class="btn btn-navy" id="modeBtn" onclick="toggleAdmin()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Chế độ: Xem</button>
+        <button class="btn btn-ghost admin-only" onclick="document.getElementById('importFile').click()" title="Nạp dữ liệu từ file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Nạp</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+        <button class="btn btn-primary admin-only" onclick="exportData()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Xuất data.json</button>
+        <div class="user-chip"><span class="nm">Phòng Kỹ thuật</span><span class="av">PKT</span></div>
+      </div>
+      <div class="filterbar">
+        <div class="search-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input id="gSearch" placeholder="Tìm kiếm công việc, người phụ trách…"></div>
+        <select class="sel" id="fCat"><option value="">Tất cả mảng</option></select>
+        <select class="sel" id="fWho"><option value="">Mọi người phụ trách</option></select>
+        <select class="sel" id="fStatus"><option value="">Mọi trạng thái</option><option value="done">Hoàn thành</option><option value="progress">Đang thực hiện</option><option value="plan">Kế hoạch</option><option value="late">Quá hạn</option></select>
+        <div class="sp" style="flex:1"></div>
+        <button class="btn btn-ghost" onclick="exportExcel()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Xuất Excel</button>
+        <button class="btn btn-primary admin-only" onclick="openAdd()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Thêm công việc</button>
+      </div>
+      <div class="view-banner"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>&nbsp;Bạn đang ở <b>&nbsp;chế độ Xem&nbsp;</b> — dữ liệu chỉ đọc. Người quản lý bấm nút "Chế độ: Xem" ở góc phải để đăng nhập chỉnh sửa.</div>
+    </div>
+
+    <div class="content">
+      <!-- DASHBOARD -->
+      <div class="page" id="page-dashboard">
+        <div class="kpi-grid" id="kpiGrid"></div>
+        <div class="rep-grid">
+          <div class="sec"><div class="sec-head"><h3>Tiến độ theo mảng</h3></div><div class="sec-body" id="dashCat"></div></div>
+          <div class="sec"><div class="sec-head"><h3>Phân bố trạng thái</h3></div><div class="sec-body" id="dashStatus"></div></div>
+        </div>
+      </div>
+
+      <!-- LIST -->
+      <div class="page" id="page-list">
+        <div class="sec">
+          <div class="sec-head">
+            <h3>Danh sách công việc <span class="sub" id="listCount" style="font-size:12.5px;color:var(--muted);font-weight:500"></span></h3>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="display:flex;align-items:center;gap:6px"><span style="font-size:12px;color:var(--muted);font-weight:600">Hiển thị tuần:</span>
+                <select class="sel" id="weekView" onchange="renderList()" style="padding:6px 10px">
+                  <option value="recent">4 tuần gần nhất</option>
+                  <option value="all">Tất cả tuần</option>
+                  <option value="month">Gom theo tháng</option>
+                </select>
+              </div>
+              <div class="view-toggle">
+                <button id="vtGrid" class="on" onclick="setListView('grid')">Dạng bảng Excel</button>
+                <button id="vtCompact" onclick="setListView('compact')">Dạng gọn</button>
+              </div>
+            </div>
+          </div>
+          <div class="sec-body" id="listGridWrap">
+            <div class="xls-wrap"><table class="xls" id="xlsTable"></table></div>
+          </div>
+          <div class="tbl-wrap" id="listCompactWrap" style="display:none">
+            <table class="list"><thead><tr><th>STT</th><th>Nội dung công việc</th><th>Nhóm</th><th>Người phụ trách</th><th>Trạng thái</th><th>Tiến độ</th><th>Hạn</th><th>Cập nhật cuối</th></tr></thead><tbody id="listBody"></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- KANBAN -->
+      <div class="page" id="page-kanban">
+        <div class="page-title">Bảng Kanban <span class="sub">· Kéo thả thẻ giữa các cột để đổi trạng thái</span></div>
+        <div class="kanban" id="kanban"></div>
+      </div>
+
+      <!-- CALENDAR -->
+      <div class="page" id="page-calendar">
+        <div class="sec">
+          <div class="sec-body">
+            <div class="cal-head">
+              <button class="btn btn-ghost" onclick="calToday()">Hôm nay</button>
+              <div class="cal-nav"><button onclick="calNav(-1)">‹</button><button onclick="calNav(1)">›</button></div>
+              <div class="mtitle" id="calTitle"></div>
+            </div>
+            <div class="cal-grid" id="calGrid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPORTS -->
+      <div class="page" id="page-reports">
+        <div class="rep-grid">
+          <div class="sec"><div class="sec-head"><h3>Tiến độ theo mảng</h3></div><div class="sec-body" id="repCat"></div></div>
+          <div class="sec"><div class="sec-head"><h3>Xu hướng theo tuần</h3></div><div class="sec-body" id="repTrend"></div></div>
+        </div>
+        <div class="sec"><div class="sec-head"><h3>Tiến độ theo người phụ trách</h3></div><div class="sec-body" id="repPerson"></div></div>
+      </div>
+
+      <!-- DOCS / REMIND / SETTINGS placeholders -->
+      <div class="page" id="page-docs"><div class="sec"><div class="sec-body"><div class="empty"><div class="big">Tài liệu</div><div>Khu vực lưu trữ tài liệu kỹ thuật — sẽ bổ sung ở bản chính thức.</div></div></div></div></div>
+      <div class="page" id="page-remind"><div class="sec"><div class="sec-body" id="remindBody"></div></div></div>
+      <div class="page" id="page-settings"><div class="sec"><div class="sec-body"><div class="empty"><div class="big">Cài đặt</div><div>Tùy chỉnh nhóm, mảng, tuần theo dõi — sẽ bổ sung ở bản chính thức.</div></div></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL DRAWER -->
+<div class="drawer-bg" id="drawerBg"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div class="num" id="dNum">1</div>
+    <h2 id="dTitle">—</h2>
+    <div id="dStatus"></div>
+    <button class="x" onclick="closeDrawer()">&times;</button>
+  </div>
+  <div class="drawer-body">
+    <div class="meta-grid" id="dMeta"></div>
+    <div class="desc-box" id="dDesc"></div>
+    <div class="tl-title">Tiến độ theo tuần</div>
+    <div class="timeline" id="dTimeline"></div>
+    <div id="dComment"></div>
+  </div>
+  <div class="drawer-foot">
+    <button class="btn btn-primary" onclick="openUpdate()" style="flex:1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Cập nhật tuần mới</button>
+    <button class="btn btn-navy" onclick="openEditFromDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Sửa</button>
+    <button class="btn btn-ghost" onclick="closeDrawer()">Đóng</button>
+  </div>
+</aside>
+
+<!-- ADD MODAL -->
+<div class="modal-bg" id="modalAdd">
+  <div class="modal">
+    <div class="modal-head"><h3>Thêm công việc mới</h3><button class="x" onclick="document.getElementById('modalAdd').classList.remove('on')">&times;</button></div>
+    <form id="addForm" onsubmit="return false">
+    <div class="modal-body">
+      <div class="field"><label>Nội dung công việc *</label><textarea id="aTitle" placeholder="VD: Bảo dưỡng động cơ định kỳ"></textarea></div>
+      <div class="row2">
+        <div class="field"><label>Nhóm</label><select id="aGroup"><option value="CNKB">Xe & CNKB</option><option value="KSCL">Kiểm soát chất lượng</option><option value="QLSL">Quản lý SL & Đo lường</option></select></div>
+        <div class="field"><label>Mảng</label><input id="aCat" list="catList" placeholder="VD: Mua sắm"><datalist id="catList"></datalist></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Người phụ trách</label><input id="aWho" placeholder="VD: Lộc"></div>
+        <div class="field"><label>Mức độ ưu tiên</label><select id="aPrio"><option value="normal">Bình thường</option><option value="high">Ưu tiên cao</option></select></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Ngày bắt đầu</label><input type="date" id="aStart" value="2026-08-17"></div>
+        <div class="field"><label>Hạn hoàn thành</label><input type="date" id="aDue"></div>
+      </div>
+      <div class="field"><label>Mô tả</label><textarea id="aDesc"></textarea></div>
+      <div class="field"><label>Kế hoạch ban đầu</label><textarea id="aPlan"></textarea></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="document.getElementById('modalAdd').classList.remove('on')">Hủy</button><button class="btn btn-primary" onclick="saveAdd()">Tạo công việc</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- UPDATE WEEK MODAL -->
+<div class="modal-bg" id="modalUpdate">
+  <div class="modal">
+    <div class="modal-head"><h3>Cập nhật tiến độ tuần</h3><button class="x" onclick="document.getElementById('modalUpdate').classList.remove('on')">&times;</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="uWorkId">
+      <div class="field"><label>Công việc</label><div style="padding:9px 12px;background:var(--gray-bg);border-radius:9px;font-weight:600;font-size:13px" id="uWorkName"></div></div>
+      <div class="field"><label>Chọn tuần cập nhật</label><select id="uWeekPick" onchange="onWeekPick()"></select></div>
+      <div class="field"><label>Kết quả / tiến độ triển khai trong tuần</label><textarea id="uResult" placeholder="Nội dung đã thực hiện (mỗi ý một dòng)" style="min-height:90px"></textarea></div>
+      <div class="row2">
+        <div class="field"><label>Tiến độ chung: <span id="uProgVal" style="color:var(--blue)">0%</span></label><input type="range" id="uProgress" min="0" max="100" step="5" value="0"></div>
+        <div class="field"><label>Trạng thái chung</label><select id="uStatus"><option value="plan">Kế hoạch</option><option value="progress">Đang thực hiện</option><option value="done">Hoàn thành</option><option value="late">Quá hạn</option><option value="pause">Tạm dừng</option></select></div>
+      </div>
+      <div class="field"><label>Kế hoạch tuần tới</label><textarea id="uNext" placeholder="Cập nhật kế hoạch chung cho tuần tới"></textarea></div>
+      <div style="font-size:11.5px;color:var(--muted);background:var(--blue-bg);padding:9px 12px;border-radius:8px">ℹ Cập nhật vào tuần đang có sẽ <b>ghi đè nội dung tuần đó</b>. Chọn "➕ Thêm tuần mới…" nếu muốn tạo thêm một cột tuần mới trong bảng.</div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="document.getElementById('modalUpdate').classList.remove('on')">Hủy</button><button class="btn btn-primary" onclick="saveUpdate()">Lưu cập nhật</button></div>
+  </div>
+</div>
+
+<!-- EDIT WORK MODAL -->
+<div class="modal-bg" id="modalEdit">
+  <div class="modal">
+    <div class="modal-head"><h3>Sửa công việc</h3><button class="x" onclick="document.getElementById('modalEdit').classList.remove('on')">&times;</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="eId">
+      <div class="field"><label>Nội dung công việc *</label><textarea id="eTitle"></textarea></div>
+      <div class="row2">
+        <div class="field"><label>Nhóm</label><select id="eGroup"><option value="CNKB">Xe & CNKB</option><option value="KSCL">Kiểm soát chất lượng</option><option value="QLSL">Quản lý SL & Đo lường</option></select></div>
+        <div class="field"><label>Mảng</label><input id="eCat" list="catList"></div>
+      </div>
+      <div class="row3">
+        <div class="field"><label>Người phụ trách</label><input id="eWho"></div>
+        <div class="field"><label>Ưu tiên</label><select id="ePrio"><option value="normal">Bình thường</option><option value="high">Ưu tiên cao</option></select></div>
+        <div class="field"><label>Hạn hoàn thành</label><input type="date" id="eDue"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Trạng thái</label><select id="eStatus"><option value="plan">Kế hoạch</option><option value="progress">Đang thực hiện</option><option value="done">Hoàn thành</option><option value="late">Quá hạn</option><option value="pause">Tạm dừng</option></select></div>
+        <div class="field"><label>Tiến độ: <span id="eProgVal" style="color:var(--blue)">0%</span></label><input type="range" id="eProgress" min="0" max="100" step="5"></div>
+      </div>
+      <div class="field"><label>Mô tả</label><textarea id="eDesc"></textarea></div>
+      <div class="field"><label>💬 Comment sau cuộc họp</label><textarea id="eComment"></textarea></div>
+      <div class="field"><label>Kế hoạch tuần tới</label><textarea id="eNextPlan" placeholder="Kế hoạch chung cho tuần tới (hiển thị ở cột cuối bảng)"></textarea></div>
+
+      <div style="margin-top:6px;border-top:1px solid var(--border);padding-top:14px">
+        <label style="font-size:11px;text-transform:uppercase;letter-spacing:.4px;font-weight:700;color:var(--text);margin-bottom:8px;display:block">Các bản ghi tuần (sửa / xóa)</label>
+        <div id="eWeekList"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" style="color:var(--red);margin-right:auto" onclick="deleteWork()">Xóa công việc</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('modalEdit').classList.remove('on')">Hủy</button>
+      <button class="btn btn-primary" onclick="saveEdit()">Lưu thay đổi</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// Dữ liệu được tải từ file data.json bên ngoài (để dễ cập nhật trên GitHub)
+window.__SEED__ = {"works":[{"id":1,"title":"Bảo dưỡng động cơ định kỳ","category":"Bảo dưỡng định kỳ","group":"CNKB","assignee":"Chiến","startDate":"2026-01-01","dueDate":"","status":"progress","progress":95,"priority":"normal","description":"Tổng hợp, rà soát hồ sơ tháng 07, trình thanh toán kì tháng 07 cho đơn vị dịch vụ trước ngày 25/8. Tiếp tục triển khai công tác kiểm tra, bảo dưỡng định kì khung gầm, động cơ XTN và MFĐ theo KH tháng 08 tại các CN","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Tổng hợp, rà soát hồ sơ tháng 07, trình thanh toán kì tháng 07 cho đơn vị dịch vụ trước ngày 25/8. Tiếp tục triển khai công tác kiểm tra, bảo dưỡng định kì khung gầm, động cơ XTN và MFĐ theo KH tháng 08 tại các CN","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Xe 10K và MFĐ động cơ Cummins:\n- Đang trình thanh toán kì tháng 07/2026\n- Theo dõi công tác kiểm tra, bảo dưỡng động cơ T8/2026 tại các CN trên cơ sở KH đã thống nhất\nXe 5K:\n- Hoàn thành công tác kiểm tra, bảo dưỡng động cơ xe 5K T7/2026 tại CN Cát Bi (hoàn thành ngày 13/07)\n- Hoàn thành trình TT cho đơn vị dịch vụ kì T7/2026\n- Theo dõi công tác bảo dưỡng động cơ T8/2026 tại Trạm Điện Biên","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Xe 10K và MFĐ động cơ Cummins:\n- Đang trình thanh toán kì tháng 07/2026 \n- Theo dõi công tác kiểm tra, bảo dưỡng động cơ T8/2026 tại các CN trên cơ sở KH đã thống nhất","updatedAt":"2026-08-15"}],"nextPlan":"- Tổng hợp, rà soát hồ sơ tháng 07, trình thanh toán kì tháng 07 cho đơn vị dịch vụ trước ngày 25/8\n- Theo dõi kế hoạch triển khai công tác kiểm tra, bảo dưỡng định kì động cơ XTN và MFĐ theo KH tháng 08 tại các CN trước ngày 31/08"},{"id":2,"title":"Bảo dưỡng khung gầm - hộp số XTN định kỳ","category":"Bảo dưỡng định kỳ","group":"CNKB","assignee":"Lộc","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"- Hoàn thành bảo dưỡng tại tất cả các CN Công ty\n- HSTT cho các CN thực hiện trong tháng 06 đã được phê duyệt và gửi TCKT","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"- Hoàn thành bảo dưỡng tại tất cả các CN Công ty\n- HSTT cho các CN thực hiện trong tháng 06 đã được phê duyệt và gửi TCKT","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Hoàn thiện, trình HSTT đợt tháng 07/2026 trước 13/08","updatedAt":"2026-08-07"}],"nextPlan":"Trình phê duyệt HSTT từ ngày 17/08"},{"id":3,"title":"Kiểm tra, bảo trì bảo dưỡng hệ thống, trang thiết bị điện cấp độ năm tại các Chi nhánh năm 2026","category":"Bảo dưỡng định kỳ","group":"CNKB","assignee":"Phong","startDate":"2026-01-01","dueDate":"","status":"progress","progress":78,"priority":"normal","description":"- Hoàn thành tờ trình chủ trương kế hoạch triển khai công tác kiểm tra, bảo trì bảo dưỡng HT điện, đã được Lãnh đạo Phòng và KTT phê duyệt. Đang trình PTGĐ phê duyệt từ ngày 10/08/2026","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"- Hoàn thành tờ trình chủ trương kế hoạch triển khai công tác kiểm tra, bảo trì bảo dưỡng HT điện, đã được Lãnh đạo Phòng và KTT phê duyệt. Đang trình PTGĐ phê duyệt từ ngày 10/08/2026","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Triển khai thủ tục, hồ sơ LCNT: Dự kiến trước 25/08/2026\n- Triển khai trình ký Hợp đồng thuê đơn vị thi công, dự kiến ngày 31/08/2026\n- Tổ chức triển khai, theo dõi công tác bảo trì tại các CN: Nội Bài, Cát Bi, Đà Nẵng, Cam Ranh (từ T09/2026); Liên Khương, TP.HCM, Phú Quốc (từ T10/2026)","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Tờ trình chủ trương đã được LĐP và Kế toán trương phê duyệt ngày 08/08/2026 , đang trình PTGĐ phê duyệt chủ trương trình ngày 10/08/2026","updatedAt":"2026-08-15"}],"nextPlan":"- Triển khai thủ tục, hồ sơ LCNT: Dự kiến trước 25/08/2026;\n- Triển khai trình ký Hợp đồng thuê đơn vị thi công, dự kiến ngày 31/08/2026;\n- Tổ chức triển khai, theo dõi công tác bảo trì, bảo dưỡng tại các Chi nhánh theo kế hoạch dự kiến: CN Nội Bài, Cát Bi, Đà Nẵng, Cam Ranh (thực hiện từ tháng 09/2026); CN Liên Khương, TP. Hồ Chí Minh, Phú Quốc (thực hiện từ tháng 10/2026)."},{"id":4,"title":"Công tác mua sắm dịch vụ đại tu khung gầm XTN cho 08 XTN","category":"Đại tu","group":"CNKB","assignee":"Lộc","startDate":"2026-01-01","dueDate":"","status":"progress","progress":38,"priority":"normal","description":"Trình phê duyệt chủ trương và dự toán thực hiện trong tháng 07/2026. Tờ trình chủ trương đã được LĐ PKT phê duyệt, bổ sung thêm nội dung báo cáo về công tác KTBD KGHS XTN theo yêu cầu của anh Tuấn - PTGĐ","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Trình phê duyệt chủ trương và dự toán thực hiện trong tháng 07/2026. Tờ trình chủ trương đã được LĐ PKT phê duyệt, bổ sung thêm nội dung báo cáo về công tác KTBD KGHS XTN theo yêu cầu của anh Tuấn - PTGĐ","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Có bản bóc tách dự toán báo cáo LĐ PKT trước ngày 12/08\n- Dự kiến TGĐ phê duyệt trước ngày 20/08","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"- Tờ trình chủ trương đã được A Tuấn PTGĐ phê duyệt\n- Đã có bóc tách dự toán thực hiện","updatedAt":"2026-08-15"}],"nextPlan":"- Báo cáo LĐ PKT về bóc tách dự toán thực hiện từ ngày 17/08\n- Dự kiến TGĐ phê duyệt trước ngày 20/08"},{"id":5,"title":"Mua sắm vật tư đại tu khung gầm 2026-2027 (Gói số 2)","category":"Đại tu","group":"CNKB","assignee":"Lộc","startDate":"2026-01-01","dueDate":"","status":"progress","progress":88,"priority":"normal","description":"Đang thực hiện trong quá trình đợi bàn giao vật tư","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Đang thực hiện trong quá trình đợi bàn giao vật tư","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Dự kiến 3/36 vật tư cuối cùng sẽ về và thông quan xong vào ngày 12/08\n- Dự kiến hoàn thành bàn giao xong đến cả 4 CN trước 22/08","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"- Cập nhật 010/08: Toàn bộ vật tư đã nhập về và thông quan, có hàng tại kho ở VN\n- Bắt đầu gửi đi các CN từ ngày 13/08","updatedAt":"2026-08-15"}],"nextPlan":"Hoàn thành bàn giao tại cả 4 CN trước ngày 20/08"},{"id":6,"title":"Đại tu Động cơ XTN","category":"Đại tu","group":"CNKB","assignee":"Chiến","startDate":"2026-01-01","dueDate":"","status":"progress","progress":78,"priority":"normal","description":"Trình phê duyệt chủ trương trước 20/07. Trình phê duyệt dự toán + KH LCNT. Tổ chức LCNT + Ký HĐ trước 30/08","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Trình phê duyệt chủ trương trước 20/07. Trình phê duyệt dự toán + KH LCNT. Tổ chức LCNT + Ký HĐ trước 30/08","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Trình phê duyệt chủ trương - dự kiến từ ngày 15/08/2026\n- Triển khai công tác LCNT dự kiến trước ngày 25/08/2026\n- Trình ký HĐ dự kiến trước ngày 10/09/2026","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"- Đang dự thảo TT chủ trương đại tu động cơ của XTN 10K trong năm 2026.","updatedAt":"2026-08-15"}],"nextPlan":"- Trên cơ sở TT chủ trương được phê duyệt, triển khai công tác LCNT dự kiến trước ngày 25/08/2026;\n- Trình ký HĐ dự kiến trước ngày 10/09/2026;"},{"id":7,"title":"Đại tu khung gầm cho 04 XTN loại 5K tại HPH và DIN","category":"Đại tu","group":"CNKB","assignee":"Lộc","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Chưa thực hiện","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Chưa thực hiện","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Lập danh mục vật tư, công việc phục vụ đại tu động cơ XTN 5K\n- Trình phê duyệt chủ trương, dự kiến trước 20/08/2026\n- Triển khai LCNT dự kiến trước 05/09/2026\n- Trình ký HĐ dự kiến trước 20/09/2026","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"- Đang rà soát, lập danh mục vật tư phục vụ đại tu động cơ của XTN 5K trong năm 2026 để lên phương án triển khai","updatedAt":"2026-08-15"}],"nextPlan":"Lập tờ trình đánh giá bảo dưỡng tổng thể cho 04 xe loại 5K, báo cáo LĐ PKT trước ngày 18/08"},{"id":8,"title":"Khắc phục sự cố lỗi bầu lường M80-2 trên XTN CXR 32007 tại CN Cam Ranh","category":"Xử lý sự cố","group":"CNKB","assignee":"Chiến","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Hoàn thành ký HĐ, đang theo dõi việc triển khai hợp đồng và trình thanh toán","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Hoàn thành ký HĐ, đang theo dõi việc triển khai hợp đồng và trình thanh toán","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Hoàn thành","updatedAt":"2026-08-07"}],"nextPlan":""},{"id":9,"title":"Sửa xe HAN-07","category":"Xử lý sự cố","group":"CNKB","assignee":"Lộc","startDate":"2026-01-01","dueDate":"","status":"done","progress":100,"priority":"normal","description":"Tiếp tục triển khai việc sửa chữa xe HAN07, dự kiến hoàn thành vào ngày 07-08/07","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Tiếp tục triển khai việc sửa chữa xe HAN07, dự kiến hoàn thành vào ngày 07-08/07","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Thực hiện thanh toán cho nhà thầu, dự kiến trước ngày 15/08","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Hoàn thành thanh toán","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":10,"title":"Khắc phục nứt xitec xe PQC03 tại CN Phú Quốc (Đã điều đi SGN)","category":"Xử lý sự cố","group":"CNKB","assignee":"Lộc","startDate":"2026-01-01","dueDate":"","status":"done","progress":100,"priority":"normal","description":"Hoàn thành LCNT và ký kết HĐ, bắt đầu thi công từ ngày 13/07, dự kiến hoàn thành ngày 20/07","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Hoàn thành LCNT và ký kết HĐ, bắt đầu thi công từ ngày 13/07, dự kiến hoàn thành ngày 20/07","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Tổng hợp, trình HSTT trước 15/08","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"- Hoàn thành sửa chữa, khắc phục ngày 21/07\n- Cập nhật ngày 14/08: Hồ sơ nghiệm thu CN TP.HCM chưa ký thống nhất do yêu cầu bổ sung lại hồ sơ về ATLĐ, PCCC;","updatedAt":"2026-08-15"}],"nextPlan":"Tổng hợp HSTT trước ngày 20/08"},{"id":11,"title":"Khắc phục lỗi bơm mồi nhiên liệu XTN 32008 tại SGN","category":"Xử lý sự cố","group":"CNKB","assignee":"Chiến","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"- Đã hoàn thành điều chuyển bơm mồi cho CN TP.HCM\n- Đơn vị Cummins đã sửa chữa khắc phục lỗi bơm mồi\n- Tổng hợp phiếu công việc, báo cáo trình thanh toán (dự kiến trước ngày 25/7). Đang trình tờ trình thanh toán đến anh Tuấn - PTGĐ","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"- Đã hoàn thành điều chuyển bơm mồi cho CN TP.HCM\n- Đơn vị Cummins đã sửa chữa khắc phục lỗi bơm mồi\n- Tổng hợp phiếu công việc, báo cáo trình thanh toán (dự kiến trước ngày 25/7). Đang trình tờ trình thanh toán đến anh Tuấn - PTGĐ","updatedAt":"2026-07-31"}],"nextPlan":""},{"id":12,"title":"Khắc phục lỗi gãy bulong vỏ cầu sau gây rò rỉ dầu cầu","category":"Xử lý sự cố","group":"CNKB","assignee":"Lộc","startDate":"2026-01-01","dueDate":"","status":"done","progress":100,"priority":"normal","description":"- Chủ trương đã được TGĐ phê duyệt","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"- Chủ trương đã được TGĐ phê duyệt","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Hoàn thiện hồ sơ nghiệm thu và thanh quyết toán cho nhà thầu trước 15/08","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Hoàn thành khắc phục từ ngày 30/07, đang trong quá trình theo dõi vận hành sau sửa chữa","updatedAt":"2026-08-15"}],"nextPlan":"Hoàn thiện hồ sơ nghiệm thu và thanh quyết toán cho nhà thầu trước 20/08"},{"id":13,"title":"Xử lý tồn tại xe 5K của DLI","category":"Xử lý sự cố","group":"CNKB","assignee":"Lộc","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Tiếp tục liên hệ hãng xử lý các tồn đọng còn lại: (1) Chức năng deactive interlock khi xe đang di chuyển → Garsite liên hệ đại diện xe nền cài đặt lại logic module BCM; (2) Lưu lượng kế không cộng vào công tơ tổng → Garsite hướng dẫn vận hành bấm \"stop\" trước \"end\" và theo dõi thêm","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Tiếp tục liên hệ hãng xử lý các tồn đọng còn lại: (1) Chức năng deactive interlock khi xe đang di chuyển → Garsite liên hệ đại diện xe nền cài đặt lại logic module BCM; (2) Lưu lượng kế không cộng vào công tơ tổng → Garsite hướng dẫn vận hành bấm \"stop\" trước \"end\" và theo dõi thêm","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Tiếp tục liên hệ hãng và đơn vị AVPM (hiện bộ BCM trống đang ở AVPM, chưa hoàn thành thủ tục hải quan để gửi sang hãng Garsite sửa chữa)","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"đang trong quá trình trao đổi với NSX","updatedAt":"2026-08-15"}],"nextPlan":"Tiếp tục liên hệ hãng đã xử lý tiếp các tồn đọng còn lại bao gồm:\n- Chức năng deactive interlock khi xe đang di chuyển => Phía Garsite sẽ liên hệ với đại diện xe nền để cài đặt lại logic trong bộ module BCM\n- Lưu lương kế không cộng lưu lượng vào công tơ tổng => Hiện tượng này thỉnh thoảng xảy ra và phía Garsite đã hướng dẫn vận hành bằng cách bấm “stop” trước khi bấm “end” và theo dõi thêm. Garsite tiếp tục làm việc với NSX thiết bị gốc"},{"id":14,"title":"Sửa chữa xe PQC04 sau sự cố va chạm","category":"Xử lý sự cố","group":"CNKB","assignee":"Lộc","startDate":"2026-01-01","dueDate":"","status":"progress","progress":78,"priority":"normal","description":"Chủ trương đã được phê duyệt","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Chủ trương đã được phê duyệt","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Triển khai công tác LCNT và ký HĐ triển khai sửa chữa trước 20/08","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Bảo hiểm đã đánh giá xong, đang trình phê duyệt dự toán và KHLCNT đến anh Tuấn - PTGĐ","updatedAt":"2026-08-15"}],"nextPlan":"Triển khai ký HĐ triển khai sửa chữa trước 30/08"},{"id":15,"title":"Khắc phục lỗi xe 5K tại trạm Điện Biên","category":"Xử lý sự cố","group":"CNKB","assignee":"Chiến","startDate":"2026-01-01","dueDate":"","status":"done","progress":100,"priority":"normal","description":"- Đã kí kết HĐ mua sắm vật tư phục vụ sửa chữa xe 5K với đơn vị dịch vụ","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"- Đã kí kết HĐ mua sắm vật tư phục vụ sửa chữa xe 5K với đơn vị dịch vụ","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Hoàn thành trình thanh toán cho đơn vị dịch vụ dự kiến trước ngày 25/08","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Hoàn thành trình thanh toán cho đơn vị dịch vụ dự kiến trước ngày 25/08","updatedAt":"2026-08-15"}],"nextPlan":"Tổng hợp hồ sơ trình thanh toán cho các đơn vị dịch vụ dự kiến trước ngày 25/08"},{"id":16,"title":"Cải tạo Interlock","category":"Dự án","group":"CNKB","assignee":"Lộc","startDate":"2026-01-01","dueDate":"","status":"done","progress":100,"priority":"normal","description":"Hoàn thành 2 xe tại HAN, đang trình ký BBNT và thanh toán","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Hoàn thành 2 xe tại HAN, đang trình ký BBNT và thanh toán","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Thực hiện thanh toán cho nhà thầu, dự kiến trước ngày 15/08","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"- QĐ phê duyệt KQLCNT và Hợp đồng đã được a Tuấn PTGĐ phê duyệt ngày 16/06\n- Hoàn thành việc thi công, lắp đặt tại PQC, HAN\n'- HSTT đã được TGĐ phê duyệt ngày 13/08","updatedAt":"2026-08-15"}],"nextPlan":"Chuyển HSTT sang P.TCKT để thực hiện tiếp"},{"id":17,"title":"Nâng cấp auto handrail","category":"Dự án","group":"CNKB","assignee":"Tú","startDate":"2026-01-01","dueDate":"","status":"progress","progress":78,"priority":"normal","description":"- Đăng tải E-HSMT, dự thảo các hồ sơ báo cáo đánh giá, báo cáo thẩm định, Tờ trình phê duyệt kết quả HSMT, QĐ phê duyệt","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"- Đăng tải E-HSMT, dự thảo các hồ sơ báo cáo đánh giá, báo cáo thẩm định, Tờ trình phê duyệt kết quả HSMT, QĐ phê duyệt","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Trình phê duyệt các hồ sơ báo cáo đánh giá, thẩm định, Tờ trình phê duyệt kết quả LCNT, QĐ phê duyệt từ ngày 11/08/2026\n- Trình ký Hợp đồng dự kiến ngày 15/08/2026","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"- Trình phê duyệt các hồ sơ báo cáo đánh giá, báo cáo thẩm định, Tờ trình phê duyệt kết quả LCNT, QĐ phê duyệt từ ngày 11/08/2026;","updatedAt":"2026-08-15"}],"nextPlan":"- Trình phê duyệt các hồ sơ báo cáo đánh giá, báo cáo thẩm định, Tờ trình phê duyệt kết quả LCNT, QĐ phê duyệt và ký Hợp đồng dự kiến ngày 22/08/2026;"},{"id":18,"title":"Nâng cấp, lắp đặt hệ thống tự động hóa trên các XTN (11 xe tại CN DAD, CXR, PQC)","category":"Dự án","group":"CNKB","assignee":"Chiến","startDate":"2026-01-01","dueDate":"","status":"done","progress":100,"priority":"normal","description":"- Hoàn thành trình các hồ sơ KH LCNT","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"- Hoàn thành trình các hồ sơ KH LCNT","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Trình phê duyệt kết quả LCNT dự kiến trước ngày 25/08/2026\n- Trình ký Hợp đồng dự kiến trước ngày 05/09/2026","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"- Đã hoàn thành  trình TT chủ trương, dự toán và KH LCNT, GUQ, QĐ thành lập tổ gói thầu  Nâng cấp, lắp đặt hệ thống tự động hóa trên các XTN giai đoạn 2\n- QĐ phê duyệt dự toán và KH LCNT đến a Tuấn - P. TGđ đã được phê duyệt\n- Đã hoàn thành trình QĐ phê duyệt HSMT","updatedAt":"2026-08-15"}],"nextPlan":"- Trình phê duyệt kết quả LCNT dự kiến trước ngày 25/08/2026;\n- Trình ký Hợp đồng dự kiến trước ngày 05/09/2026;"},{"id":19,"title":"Giải pháp PLC các xe 10K","category":"Dự án","group":"CNKB","assignee":"Lộc","startDate":"2026-01-01","dueDate":"","status":"plan","progress":10,"priority":"normal","description":"Đã liên hệ với NSX nhưng chưa được phản hồi về giải pháp chuyển giao. Đang nghiên cứu cách sử dụng phần mềm PLC trên các xe (ES-KEY for Class 1)","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Đã liên hệ với NSX nhưng chưa được phản hồi về giải pháp chuyển giao. Đang nghiên cứu cách sử dụng phần mềm PLC trên các xe (ES-KEY for Class 1)","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Mail gửi Skymark, AVPM ngày 10/08 về phương án thử nghiệm sao lưu chương trình PLC trên XTN chờ phản hồi\n- Khảo sát XTN tại HAN cùng đơn vị AVPM trước ngày 14/08\n- Báo cáo phương án, kế hoạch với LĐ PKT trước 20/08","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"- Đã gửi mail nhắc nhở đến NSX Garsite, Skymark ngày 03/06\n'Đã liên hệ với NSX nhưng chưa được phản hồi về giải pháp chuyển giao. Đang thực hiện nghiên cứu cách sử dụng phần mềm của PLC trên các xe (ES-KEY for Class 1)\n- Đã gửi mail Skymark và AVPM về kế hoạch khảo sát tại CN Nội Bài ngày 09/08","updatedAt":"2026-08-15"}],"nextPlan":"Dự kiến khảo sát tại CN Nội Bài 01 ngày trong tuần tới"},{"id":20,"title":"Thử nghiệm thang nhôm, triển khai áp dụng đại trà khi đạt yêu cầu","category":"Dự án","group":"CNKB","assignee":"Tú","startDate":"2026-01-01","dueDate":"","status":"progress","progress":55,"priority":"normal","description":"- Dự thảo TT phê duyệt thang nhôm","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"- Dự thảo TT phê duyệt thang nhôm","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Phối hợp với CN Cát Bi trình phê duyệt TT chủ trương thay đổi thiết kế để giảm tải trọng thang XTN dự kiến ngày 22/08/2026\n- Sau khi được phê duyệt, lập và trình dự toán, phương án LCNT từ ngày 22/08/2026","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Phối hợp với CN Cát Bi thử nghiệm mẫu thang XTN mới làm cơ sở trình phê duyệt Tờ trình chủ trương cùng mẫu thiết kế mới để trang bị đồng loạt cho các CN","updatedAt":"2026-08-15"}],"nextPlan":"-Tiếp tục phối hợp với CN Cát Bi trình phê duyệt TT chủ trương thay đổi thiết kế để giảm tải trọng thang XTN dự kiến ngày 22/08/2026;\n- Sau khi được phê duyệt chủ trương, lập và trình dự toán, phương án tổ chức LCNT đơn vị thi công, triển khai áp dụng đồng bộ cho các Chi nhánh, dự kiến từ ngày 22/08/2026;"},{"id":21,"title":"Hợp đồng cung cấp dầu nhớt động cơ XTN và MPĐ giai đoạn 2026-2027","category":"Dự án","group":"CNKB","assignee":"Lộc","startDate":"2026-01-01","dueDate":"","status":"progress","progress":95,"priority":"normal","description":"Đã cung cấp dầu nhớt Q1/2026 cho các Chi nhánh và hoàn thành việc thanh quyết toán","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Đã cung cấp dầu nhớt Q1/2026 cho các Chi nhánh và hoàn thành việc thanh quyết toán","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Hoàn thành HSTT trước 15/08\n- Trình phê duyệt chủ trương cung cấp dầu nhớt giai đoạn sắp tới, dự kiến từ 20/08/2026\n- Triển khai LCNT dự kiến từ 25/08/2026\n- Trình ký HĐ mới, dự kiến trước 15/09/2026","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Hoàn thành bàn giao tại 05 CN\n- Đã thống nhất các ND thanh quyết toán và thanh lý HĐ, gửi mail xác nhận ngày 10/08","updatedAt":"2026-08-15"}],"nextPlan":"Hoàn thiện HSTT và Thanh lý HĐ trước ngày 19/08"},{"id":22,"title":"Đánh giá hiện trạng hệ thống, trang thiết bị điện và đề xuất chủ trương triển khai sửa chữa, cải tạo hệ thống điện tại các Chi nhánh","category":"Dự án","group":"CNKB","assignee":"Phong","startDate":"2026-01-01","dueDate":"","status":"done","progress":100,"priority":"normal","description":"Đã ký được LĐP dự thảo, đang trình a Tuấn PTGĐ và TGĐ phê duyệt","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Đã ký được LĐP dự thảo, đang trình a Tuấn PTGĐ và TGĐ phê duyệt","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Rà soát, thống nhất kế hoạch phương án khắc phục CN Liên Khương trước 15/08 và CN Cam Ranh trước 25/08/2026\n- Phối hợp CN Nội Bài làm việc với Cảng HK QT Nội Bài để thống nhất phương án tách nguồn điện trung thế riêng (từ T09/2026)\n- Phối hợp CN TP.HCM lập phương án trạm biến áp riêng (từ 15/08/2026)","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"- Hoàn thành bảng đánh giá hiện trạng hệ thống điện tại các Chi nhánh đã được các LĐ và TGĐ phê duyệt chủ trương ngày 05/08/2026","updatedAt":"2026-08-15"}],"nextPlan":"- Rà soát, thống nhất nội dung kế hoạch phương án khắc phục, sửa chữa các tồn tại của Chi nhánh Liên Khương trước ngày 15/08 và Chi nhánh Cam Ranh trước ngày 25/08/2026.\n- Tiếp tục phối hợp cùng CN Nội Bài (đầu mối) làm việc với Cảng HK QT Nội Bài, Trung tâm Dịch vụ kỹ thuật hàng không Nội Bài để thống nhất kế hoạch, lập phương án cải tạo, tách đường nguồn cấp điện trung thế riêng cho Chi nhánh Nội Bài; Dự kiến bắt đầu triển khai từ tháng 09/2026;\n- Tiếp tục phối hợp cùng CN TP.HCM làm việc với các đơn vị liên quan (Sư đoàn 370 và đơn vị điện lực địa phương, CQ QL PCCC) để thống nhất lập phương án tách đường nguồn, phương án đấu nối và vị trí lắp đặt trạm biến áp riêng;  (chưa thống nhất, đang hẹn lại lịch làm việc dự kiến trước 22/08)"},{"id":23,"title":"Tổ chức đào tạo nghiệp vụ chuyên môn về công tác kiểm tra, bảo trì và an toàn điện cho cán bộ, nhân viên phụ trách hệ thống điện tại các Chi nhánh","category":"Dự án","group":"CNKB","assignee":"Phong","startDate":"2026-01-01","dueDate":"","status":"progress","progress":25,"priority":"normal","description":"- Rà soát các quy định để xây dựng Báo cáo kế hoạch tổ chức đào tạo nghiệp vụ, trình phê duyệt từ ngày 11/08/2026\n- Liên hệ làm việc với các đơn vị có năng lực","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Rà soát các quy định để xây dựng Báo cáo kế hoạch tổ chức đào tạo nghiệp vụ, trình phê duyệt từ ngày 11/08/2026\n- Liên hệ làm việc với các đơn vị có năng lực","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"đang lập TT chủ trương trình Lãnh đạo phòng phê duyệt","updatedAt":"2026-08-15"}],"nextPlan":"- Rà soát các quy định để xây dựng Báo cáo kế hoạch tổ chức đào tạo nghiệp vụ chuyên môn về công tác kiêm tra, bảo trì và an toàn điện cho các cán bộ, nhân viên phụ trách hệ thống điện tại các Chi nhánh trình phê duyệt từ ngày 18/08/2026\n- Liên hệ làm việc với các đơn vị có năng lực,"},{"id":24,"title":"Phê duyệt kế hoạch, phương án thực hiện công tác vệ sinh và kiểm định 03 bể chứa tại DLI","category":"CNKB","group":"CNKB","assignee":"Tú","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"- Phối hợp cùng CN lập tờ trình chủ trương, kế hoạch và chi phí trình LĐ cty phê duyệt\n- Trình LĐ Cty ủy quyền cho CN thực hiện thủ tục ký HĐ thuê đơn vị\n- Lập kế hoạch triển khai, theo dõi thực hiện, nghiệm thu","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"- Phối hợp cùng CN lập tờ trình chủ trương, kế hoạch và chi phí trình LĐ cty phê duyệt\n- Trình LĐ Cty ủy quyền cho CN thực hiện thủ tục ký HĐ thuê đơn vị\n- Lập kế hoạch triển khai, theo dõi thực hiện, nghiệm thu","updatedAt":"2026-07-31"}],"nextPlan":""},{"id":25,"title":"Bơm công nghệ","category":"Mua sắm","group":"CNKB","assignee":"Chiến","startDate":"2026-01-01","dueDate":"","status":"done","progress":100,"priority":"normal","description":"Đã trình các hồ sơ phê duyệt HSMT","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Đã trình các hồ sơ phê duyệt HSMT","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Trình các hồ sơ phê duyệt KQ LCNT dự kiến trước ngày 20/08\n- Kí kết Hợp đồng (Dự kiến trước ngày 26/08)","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"- Đã hoàn thành trình kí TT chủ trương\n- Đã trình TT phê duyệt dự toán và KH LCNT, Giấy ủy quyền, QĐ thành lập tổ đấu thầu;\n- Đã trình QĐ phê duyệt HSMT","updatedAt":"2026-08-15"}],"nextPlan":"Dự thảo các hồ sơ phê duyệt KQ LCNT, Hợp đồng dự kiến trước ngày 26/08"},{"id":26,"title":"Ống mềm thủy lực tại CXR, DAD","category":"Mua sắm","group":"CNKB","assignee":"Lộc","startDate":"2026-01-01","dueDate":"","status":"done","progress":100,"priority":"normal","description":"Phê duyệt QĐ dự toán và KH LCNT trước 24/06. Trình phê duyệt HSMT từ 22-26/06. Đăng tải TBMT ngày 08/07, Mở thầu 15/07, đang đánh giá HSDT","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Phê duyệt QĐ dự toán và KH LCNT trước 24/06. Trình phê duyệt HSMT từ 22-26/06. Đăng tải TBMT ngày 08/07, Mở thầu 15/07, đang đánh giá HSDT","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Ký kết HĐ theo phê duyệt của TGĐ, dự kiến ký HĐ và đăng tải KQLCNT trước ngày 13/08","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"- Đăng tải KH LCNT lên trang muasamcong ngày 24/06\n- Đăng tải TBMT ngày 08/07 và đóng thầu ngày 15/07\n- Hoàn thành Báo cáo đánh giá HSDT ngày 20/07\n- Hoàn thành Báo cáo thẩm định ngày 22/07\n- KQLCNT được phê duyệt và đăng tải ngày 12/08","updatedAt":"2026-08-15"}],"nextPlan":"- Hoàn thiện ký kết hợp đồng và thực hiện tạm ứng HĐ trước ngày 19/08"},{"id":27,"title":"Mua lõi lọc","category":"Mua sắm","group":"CNKB","assignee":"Chiến","startDate":"2026-01-01","dueDate":"","status":"progress","progress":95,"priority":"normal","description":"Ký HĐ trước 15/07, bàn giao trước 15/08","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Ký HĐ trước 15/07, bàn giao trước 15/08","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Tổng hợp hồ sơ trình thanh toán cho đơn vị dịch vụ (dự kiến trước 20/08)","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"- Đã hoàn thành trình tạm ứng cho đơn vị dịch vụ.\n- - Đã hoàn thành công tác bàn giao cho các Chi nhánh","updatedAt":"2026-08-15"}],"nextPlan":"- Tổng hợp hồ sơ trình thanh toán cho đơn vị dịch vụ (dự kiến trước 26/08)"},{"id":28,"title":"Vật tư cấp thiết","category":"Mua sắm","group":"CNKB","assignee":"Tú","startDate":"2026-01-01","dueDate":"","status":"progress","progress":55,"priority":"normal","description":"- Đã hoàn thành trình phê duyệt QĐ phê duyệt dự toán và KHLCNT ngày 07/08/2026","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"- Đã hoàn thành trình phê duyệt QĐ phê duyệt dự toán và KHLCNT ngày 07/08/2026","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Trình các hồ sơ phê duyệt KQ LCNT dự kiến trước ngày 25/08\n- Kí kết Hợp đồng (Dự kiến trước ngày 30/08)","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"-- Trình phê duyệt báo cáo thẩm định, QĐ phê duyệt HSMT ngày 11/08/2026;\n'- Trình các hồ sơ phê duyệt KQ LCNT dự kiến trước ngày 25/08;\n- Kí kết Hợp đồng (Dự kiến trước ngày 30/08)","updatedAt":"2026-08-15"}],"nextPlan":"-- Trình phê duyệt báo cáo thẩm định, QĐ phê duyệt HSMT ngày 17/08/2026;\n'- Trình các hồ sơ phê duyệt KQ LCNT dự kiến trước ngày 25/08;\n- Kí kết Hợp đồng (Dự kiến trước ngày 30/08)"},{"id":29,"title":"Mua bổ sung niêm nhựa","category":"Mua sắm","group":"CNKB","assignee":"Tú","startDate":"2026-01-01","dueDate":"","status":"progress","progress":55,"priority":"normal","description":"- Đang trình phê duyệt chủ trương tới TGĐ","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"- Đang trình phê duyệt chủ trương tới TGĐ","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Dự thảo TT dự toán, QĐ phê duyệt dự toán và KHLCNT và trình phê duyệt sau khi TGĐ phê duyệt chủ trương (21/08)","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"- Đã được TGĐ phê duyệt chủ trương tới TGĐ ngày 14/08/2026","updatedAt":"2026-08-15"}],"nextPlan":"- Dự thảo TT dự toán, QĐ phê duyệt dự toán và KHLCNT, Giấy Ủy quyền và trình phê duyệt sau khi TGĐ phê duyệt chủ trương (21/08)"},{"id":30,"title":"Mua bổ sung lốp cho các Chi nhánh năm 2026","category":"Mua sắm","group":"CNKB","assignee":"Chiến","startDate":"2026-01-01","dueDate":"","status":"done","progress":100,"priority":"normal","description":"Trình phê duyệt dự toán + KH LCNT. Tổ chức LCNT + ký HĐ triển khai trước ngày 30/09","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Trình phê duyệt dự toán + KH LCNT. Tổ chức LCNT + ký HĐ triển khai trước ngày 30/09","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Trình các hồ sơ phê duyệt KQ LCNT dự kiến trước ngày 25/08\n- Trình ký Hợp đồng dự kiến trước ngày 6/09","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"- Đã hoàn thành trình QĐ phê duyệt HSMT","updatedAt":"2026-08-15"}],"nextPlan":"- Dự thảo các hồ sơ LCNT dự kiến trước ngày 26/08\n- Kí kết Hợp đồng dự kiến trước ngày 07/09"},{"id":31,"title":"Mua bổ sung ống mềm tra nạp cho các Chi nhánh năm 2026","category":"Mua sắm","group":"CNKB","assignee":"Chiến","startDate":"2026-01-01","dueDate":"","status":"progress","progress":95,"priority":"normal","description":"- Đã hoàn thành kí kết HĐ 140426/HĐMBHH/PA-ENSOTECH\n- Đã tạm ứng 30% giá trị HĐ\n- Đã hoàn thành bàn giao cho các đơn vị theo HĐ\n- Đang tổng hợp trình thanh toán","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"- Đã hoàn thành kí kết HĐ 140426/HĐMBHH/PA-ENSOTECH\n- Đã tạm ứng 30% giá trị HĐ\n- Đã hoàn thành bàn giao cho các đơn vị theo HĐ\n- Đang tổng hợp trình thanh toán","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Đang tổng hợp trình thanh toán cho đơn vị dịch vụ dự kiến trước 20/08","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"-Tiếp tục phối hợp đơn vị dịch vụ để theo dõi tiến độ bàn giao theo Hợp đồng.\n-- Đã hoàn thành bàn giao cho các Chi nhánh\n- Đang trình thanh toán đến a Tuấn - P. TGĐ","updatedAt":"2026-08-15"}],"nextPlan":"- Trình thanh toán cho đơn vị dịch vụ dự kiến trước ngày 25/08"},{"id":32,"title":"QT.KT.06","category":"Quy trình","group":"CNKB","assignee":"Lộc","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Đã trình bản dự thảo QT.06 và hồ sơ ban hành liên quan trước ngày 16/07/2026. Dự kiến QĐ ban hành ngày 03/07 và có hiệu lực từ 01/08 sau khi LĐ Cty phê duyệt","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Đã trình bản dự thảo QT.06 và hồ sơ ban hành liên quan trước ngày 16/07/2026. Dự kiến QĐ ban hành ngày 03/07 và có hiệu lực từ 01/08 sau khi LĐ Cty phê duyệt","updatedAt":"2026-07-31"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Đã trình bản dự thảo QT.06 và hồ sơ ban hành liên quan trước ngày 16/07/2026\nDự kiến QĐ ban hành vào ngày 03/07 và có hiệu lực từ ngày 01/08 sau khi được LĐ Cty phê duyệt","updatedAt":"2026-08-15"}],"nextPlan":"- Dự kiến QĐ ban hành vào ngày 03/07 và có hiệu lực từ ngày 01/08 sau khi được LĐ Cty phê duyệt"},{"id":33,"title":"QT.KT.07","category":"Quy trình","group":"CNKB","assignee":"Tú","startDate":"2026-01-01","dueDate":"","status":"done","progress":100,"priority":"normal","description":"- Chỉnh sửa nội dung trình PTGĐ phê duyệt (17/08)","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Chỉnh sửa nội dung trình PTGĐ phê duyệt (17/08)","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"- Đã hoàn thành các bản dự thảo trình LĐ phòng phê duyệt ngày 30/06/2026","updatedAt":"2026-08-15"}],"nextPlan":"- Cập nhật ý kiến sửa đổi cuối cùng của Lãnh đạo phòng về nội dung để trình PTGĐ phê duyệt ban hành\\;\n- Phổ biến, đào tạo;\nQT.KT.07 Chỉnh sửa nội dung trình PTGĐ phê duyệt (11/08)"},{"id":34,"title":"QT.KT.05","category":"Quy trình","group":"CNKB","assignee":"a.Ngọc","startDate":"2026-01-01","dueDate":"","status":"done","progress":100,"priority":"normal","description":"Họp thống nhất 27/6. Gửi email trao đổi với các Chi nhánh, lấy ý kiến góp ý nội dung sửa đổi QT","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Họp thống nhất 27/6. Gửi email trao đổi với các Chi nhánh, lấy ý kiến góp ý nội dung sửa đổi QT","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Rà soát, cập nhật các nội dung, sửa đổi biểu mẫu phù hợp theo yêu cầu, quy định mới. Kết hợp trao đổi song song cùng QLKT tại các CN (khoảng 30% dung lượng QT)","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"- Rà soát, cập nhật nội dung, sửa đổi biểu mẫu trên cơ sở ý kiến CN","updatedAt":"2026-08-15"}],"nextPlan":"Dự kiến hoàn thành dự thảo QT ngày 18/08/2026\n- Trình LĐ xem xét trước 25/08/2026\n- Trình ban hành dự kiến trước 10/09/2026\n- Phổ biến áp dụng trước 20/09/2026"},{"id":35,"title":"QT.KT.09, 10","category":"Quy trình","group":"CNKB","assignee":"Tú","startDate":"2026-01-01","dueDate":"","status":"done","progress":100,"priority":"normal","description":"Họp thống nhất 20/6 - Thứ 2 22/6 chỉnh sửa để ban hành","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Họp thống nhất 20/6 - Thứ 2 22/6 chỉnh sửa để ban hành","updatedAt":"2026-07-31"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"- Đã hoàn thành các bản dự thảo trình LĐ phòng phê duyệt ngày 30/06/2026","updatedAt":"2026-08-15"}],"nextPlan":"- Cập nhật ý kiến sửa đổi cuối cùng của Lãnh đạo phòng về nội dung để trình PTGĐ phê duyệt ban hành\\;\n- Phổ biến, đào tạo;\nQT.KT.07 Chỉnh sửa nội dung trình PTGĐ phê duyệt (11/08)"},{"id":36,"title":"QT Hướng dẫn quản lý, bảo dưỡng hệ thống điện","category":"Quy trình","group":"CNKB","assignee":"Phong","startDate":"2026-01-01","dueDate":"","status":"done","progress":100,"priority":"normal","description":"Chưa thực hiện","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Chưa thực hiện","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Nghiên cứu, rà soát các quy định liên quan để xây dựng khung nội dung QT mới (tách khỏi QT.KT.05)","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Nghiên cứu, rà soát, tổng hợp lại các quy định có liên quan của cơ quan QLNN, các tổ chức quản lý về hàng không, xăng dầu để xây dựng khung nội dung QT mới (tách biệt khỏi QT.KT.05)","updatedAt":"2026-08-15"}],"nextPlan":"Dự kiến trình khung trước ngày 18/08/2026;\n- Dự thảo từng nội dung, các chương của QT (mỗi tuần cập nhật nội dung 1 chương). \n- Hoàn thành dự thảo, họp lấy ý kiến trong Phòng trước ngày 05/09/2026; Gửi các CN lấy ý kiến trước ngày 15/09/2026;\n- Sửa đổi, cập nhật và trình ban hành trước ngày 25/09/2026;\n- Phổ biến, áp dụng QT trước ngày 30/09/2026;"},{"id":37,"title":"Tổ chức đào tạo nghiệp vụ chuyên môn về công tác kiêm tra, bảo trì và an toàn điện cho các cán bộ, nhân viên phụ trách hệ thống điện tại các Chi nhánh","category":"Đào tạo","group":"CNKB","assignee":"Phong","startDate":"2026-01-01","dueDate":"","status":"progress","progress":25,"priority":"normal","description":"Chưa thực hiện","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Chưa thực hiện","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Liên hệ, làm việc về nội dung công việc với đơn vị đào tạo\n- đang lập tờ trình chủ trương","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"đang lập TT chủ trương trình Lãnh đạo phòng phê duyệt","updatedAt":"2026-08-15"}],"nextPlan":"- Rà soát các quy định để xây dựng Báo cáo kế hoạch tổ chức đào tạo nghiệp vụ chuyên môn về công tác kiêm tra, bảo trì và an toàn điện cho các cán bộ, nhân viên phụ trách hệ thống điện tại các Chi nhánh trình phê duyệt từ ngày 18/08/2026\n- Liên hệ làm việc với các đơn vị có năng lực,"},{"id":38,"title":"Báo cáo KSCL định kỳ tháng","category":"Hoạt động KSCL","group":"KSCL","assignee":"Duy, Tùng","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Đã gửi báo cáo tháng 08 cho LĐ Phòng","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Đã gửi báo cáo tháng 08 cho LĐ Phòng","updatedAt":"2026-08-07"}],"nextPlan":""},{"id":39,"title":"Vệ sinh bể chứa","category":"Hoạt động KSCL","group":"KSCL","assignee":"Duy","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Hoàn thành vệ sinh bể A16 ngày 13/07, Hoàn thành vệ sinh bể A17. Thống nhất phương án vệ sinh B11 TKXD TLY và phương án vệ sinh T-1503 VPT","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Hoàn thành vệ sinh bể A16 ngày 13/07, Hoàn thành vệ sinh bể A17. Thống nhất phương án vệ sinh B11 TKXD TLY và phương án vệ sinh T-1503 VPT","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Theo dõi triển khai vệ sinh B11 từ 14/08/2026. Theo dõi vệ sinh T-1503 VPT trong tháng 09/2026","updatedAt":"2026-08-15"}],"nextPlan":"Theo dõi triển khai vệ sinh B11 từ 14/08/2026. Theo dõi vệ sinh T-1503 VPT trong tháng 09/2026"},{"id":40,"title":"Đánh giá PTN","category":"PTN","group":"KSCL","assignee":"Tùng","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Hoàn thành đánh giá tại: DAD (08/05); CXR (04/06); VPT (05/06); HAN (22/07) và SGN (31/07)","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Hoàn thành đánh giá tại: DAD (08/05); CXR (04/06); VPT (05/06); HAN (22/07) và SGN (31/07)","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Đánh giá PQC và HPH trong tháng 08-09/2026","updatedAt":"2026-08-15"}],"nextPlan":"Đánh giá PQC và HPH trong tháng 08-09/2026"},{"id":41,"title":"Bảo dưỡng thiết bị PTN","category":"PTN","group":"KSCL","assignee":"Tùng","startDate":"2026-01-01","dueDate":"","status":"done","progress":100,"priority":"normal","description":"Đang trình phê duyệt chủ trương","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Đang trình phê duyệt chủ trương","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Hoàn thành trình ký chủ trương trước ngày 15/08","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":42,"title":"Sửa chữa thiết bị PTN tại CN CXR và VPT","category":"PTN","group":"KSCL","assignee":"Tùng","startDate":"2026-01-01","dueDate":"","status":"done","progress":100,"priority":"normal","description":"Nghiệm thu sau sửa chữa và thanh toán","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Nghiệm thu sau sửa chữa và thanh toán","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Hoàn thành thanh toán trước 15/08","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":43,"title":"Sửa chữa thiết bị PTN tại DAD","category":"PTN","group":"KSCL","assignee":"Tùng","startDate":"2026-01-01","dueDate":"","status":"progress","progress":78,"priority":"normal","description":"Đang trình LĐ Công ty phê duyệt ký HĐ với đơn vị dịch vụ ngày 06/08","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Đang trình LĐ Công ty phê duyệt ký HĐ với đơn vị dịch vụ ngày 06/08","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Hoàn thành trình ký HĐ trước 12/08","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":44,"title":"Kế hoạch rà soát, kiểm tra hoạt động, thực trạng hệ thống CSVCKT tại các Chi nhánh","category":"Đánh giá thực tế","group":"KSCL","assignee":"Duy","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Đã được phê duyệt kế hoạch. Triển khai tại DAD 29-31/7 và DLI 05-07/08","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Đã được phê duyệt kế hoạch. Triển khai tại DAD 29-31/7 và DLI 05-07/08","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Dự kiến tại PQC hoặc HAN từ 17-19/08","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":45,"title":"Đánh giá NCC","category":"Đánh giá thực tế","group":"KSCL","assignee":"Duy","startDate":"2026-01-01","dueDate":"","status":"done","progress":100,"priority":"normal","description":"Gửi thông báo đánh giá (hồ sơ) đơn vị dịch vụ giám định trong và ngoài nước. Hiện đang trong giai đoạn tiếp nhận hồ sơ của các đơn vị GĐ ĐL (đã nhận được hồ sơ của Amspec Sing, Amspec Thái)","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Gửi thông báo đánh giá (hồ sơ) đơn vị dịch vụ giám định trong và ngoài nước. Hiện đang trong giai đoạn tiếp nhận hồ sơ của các đơn vị GĐ ĐL (đã nhận được hồ sơ của Amspec Sing, Amspec Thái)","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Lập báo cáo đánh giá năng lực của các đơn vị dịch vụ giám định sau khi nhận được hồ sơ (dự kiến hoàn thành trước ngày 10/09)","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":46,"title":"Lims","category":"Dự án","group":"KSCL","assignee":"Thái","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"- Liên hệ đơn vị có năng lực để đưa ra giải pháp thực hiện\n- Thực hiện khảo sát tại CN HAN ngày 04/08","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- Liên hệ đơn vị có năng lực để đưa ra giải pháp thực hiện\n- Thực hiện khảo sát tại CN HAN ngày 04/08","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Báo cáo lại phương án triển khai trước 15/08","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":47,"title":"Pha phụ gia","category":"Dự án","group":"KSCL","assignee":"Thái","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Triển khai khảo sát thực tế tại TKXD Nhà Bè","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Triển khai khảo sát thực tế tại TKXD Nhà Bè","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Báo cáo lại phương án triển khai trước 15/08","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":48,"title":"Hội thi tra nạp","category":"Dự án","group":"KSCL","assignee":"Duy","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Đã lập dự thảo TT chủ trương và kịch bản sơ bộ hội thi tra nạp. Đã gửi dự thảo cho P.ANAT để phối hợp hoàn thiện (gửi ngày 05/08)","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Đã lập dự thảo TT chủ trương và kịch bản sơ bộ hội thi tra nạp. Đã gửi dự thảo cho P.ANAT để phối hợp hoàn thiện (gửi ngày 05/08)","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Tổ chức họp thống nhất nội dung dự thảo trước khi trình LĐCT phê duyệt (trước 15/08)","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":49,"title":"Đầu tư xe tra nạp","category":"Dự án","group":"KSCL","assignee":"Duy","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Đã được phê duyệt thư mời chào giá. Đang triển khai đánh giá các hồ sơ chào giá","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Đã được phê duyệt thư mời chào giá. Đang triển khai đánh giá các hồ sơ chào giá","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Hoàn thiện đánh giá hồ sơ chào giá trước 20/08","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":50,"title":"Hóa chất, chất chuẩn","category":"Mua sắm","group":"KSCL","assignee":"Thái","startDate":"2026-01-01","dueDate":"","status":"done","progress":100,"priority":"normal","description":"Hoàn thành thanh quyết toán HĐ mua HCCC 2026","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Hoàn thành thanh quyết toán HĐ mua HCCC 2026","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Hoàn thành (Done) · Tiến độ ST: 8/8\nTờ trình Tạm ứng chi phí mua HCCC - Đã phê duyệt, phòng TCKT đang thực hiện đi UNC\n(Nguồn: Jira PKT-795)","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":51,"title":"Viên thử nước","category":"Mua sắm","group":"KSCL","assignee":"Thái","startDate":"2026-01-01","dueDate":"","status":"progress","progress":55,"priority":"normal","description":"Hoàn thành thanh toán đợt 1, chờ giao hàng các đợt 2 và 3","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Hoàn thành thanh toán đợt 1, chờ giao hàng các đợt 2 và 3","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Đang thực hiện · Tiến độ ST: 7/7\nĐã hoàn thiện các thủ tục LCNT + Được phê duyệt Báo cáo KQ LCNT + Đang trình HĐ đến LĐ Công ty\n(Nguồn: Jira PKT-903)","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":52,"title":"Vật tư hóa nghiệm","category":"Mua sắm","group":"KSCL","assignee":"Thái","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Hoàn thành ký Hợp đồng, chờ bàn giao","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Hoàn thành ký Hợp đồng, chờ bàn giao","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Đang thực hiện · Tiến độ ST: 6/7\n(Nguồn: Jira PKT-1094)","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":53,"title":"Thiết bị xác định hàm lượng FAME cho SGN","category":"Mua sắm","group":"KSCL","assignee":"Tùng","startDate":"2026-01-01","dueDate":"","status":"progress","progress":78,"priority":"normal","description":"- QĐ số 432 ngày 22/07/2026 phê duyệt dự toán và KHLCNT gói thầu mua thiết bị xác định hàm lượng FAME\n- Đăng tải E-HSMT ngày 28/07 và nhận E-HSDT gửi về ngày 07/08","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- QĐ số 432 ngày 22/07/2026 phê duyệt dự toán và KHLCNT gói thầu mua thiết bị xác định hàm lượng FAME\n- Đăng tải E-HSMT ngày 28/07 và nhận E-HSDT gửi về ngày 07/08","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Đánh giá E-HSDT và trình LĐ Công ty phê duyệt ký HĐ với đơn vị cung cấp trước ngày 25/08","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":54,"title":"Mua thiết bị cho PTN các CN (chưng cất, chớp cháy, Saybolt)","category":"Mua sắm","group":"KSCL","assignee":"Tùng","startDate":"2026-01-01","dueDate":"","status":"progress","progress":55,"priority":"normal","description":"- QĐ số 459 ngày 03/08 phê duyệt dự toán và KHLCNT gói thầu mua thiết bị hóa nghiệm cho PTN các CN\n- Trình LĐ Công ty phê duyệt E-HSMT ngày 07/08","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"- QĐ số 459 ngày 03/08 phê duyệt dự toán và KHLCNT gói thầu mua thiết bị hóa nghiệm cho PTN các CN\n- Trình LĐ Công ty phê duyệt E-HSMT ngày 07/08","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Đăng tải E-HSMT và nhận E-HSDT trước ngày 18/08","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":55,"title":"Bình lọc ngưng tách","category":"Mua sắm","group":"KSCL","assignee":"Duy","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Hoàn thành ký HĐ, tạm ứng đợt 1, đang theo dõi triển khai HĐ","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Hoàn thành ký HĐ, tạm ứng đợt 1, đang theo dõi triển khai HĐ","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Triển khai lắp đặt tại DAD trước 31/12","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":56,"title":"Rà soát, cập nhật QT ISO 17025:2017","category":"Quy trình, tài liệu tham khảo","group":"KSCL","assignee":"Tùng","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Xây dựng dự thảo (tiếp nhận ý kiến góp ý từ CN, chuyên gia đánh giá)","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Xây dựng dự thảo (tiếp nhận ý kiến góp ý từ CN, chuyên gia đánh giá)","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Hoàn thiện dự thảo trước 30/09","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":57,"title":"QT.KT.11","category":"Quy trình, tài liệu tham khảo","group":"KSCL","assignee":"Duy","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Xây dựng dự thảo (tiếp nhận ý kiến góp ý từ CN và các phòng ban nghiệp vụ)","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Xây dựng dự thảo (tiếp nhận ý kiến góp ý từ CN và các phòng ban nghiệp vụ)","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Hoàn thiện dự thảo trước 15/09","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":58,"title":"Tổ chức Biên dịch song ngữ tài liệu quốc tế","category":"Quy trình, tài liệu tham khảo","group":"KSCL","assignee":"Duy","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Hoàn thành ký HĐ dịch thuật, đang theo dõi triển khai thực hiện HĐ","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Hoàn thành ký HĐ dịch thuật, đang theo dõi triển khai thực hiện HĐ","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Đang thực hiện · Tiến độ ST: 6/9\n(Nguồn: Jira PKT-899)","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":59,"title":"Báo cáo, công văn đánh giá hao hụt 06 tháng đầu năm","category":"Hoạt động QLSL","group":"QLSL","assignee":"","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Đã được TGĐ phê duyệt báo cáo và công văn","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Đã được TGĐ phê duyệt báo cáo và công văn","updatedAt":"2026-07-31"}],"nextPlan":""},{"id":60,"title":"Đánh giá thực tế các CN","category":"Hoạt động QLSL","group":"QLSL","assignee":"","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Lên kế hoạch đánh giá chuyên đề về công tác KSHH tại CXR và SGN trong quý III","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Lên kế hoạch đánh giá chuyên đề về công tác KSHH tại CXR và SGN trong quý III","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Đã được phê duyệt TT rà soát thực tế KSHH tại SGN từ 17/7-21/7","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Rà soát thực tế tại SGN từ 17/7-21/7","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":61,"title":"LCR-iQ","category":"Đo lường","group":"QLSL","assignee":"","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Đã hoàn thành dự thảo, đang trình anh Tuấn - PTGĐ phê duyệt","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Đã hoàn thành dự thảo, đang trình anh Tuấn - PTGĐ phê duyệt","updatedAt":"2026-07-31"}],"nextPlan":""},{"id":62,"title":"Kiểm định lại bể chứa tại CXR","category":"Đo lường","group":"QLSL","assignee":"","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Hoàn thành các thủ tục ban hành Barem + thanh toán","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Hoàn thành các thủ tục ban hành Barem + thanh toán","updatedAt":"2026-07-31"}],"nextPlan":""},{"id":63,"title":"KĐ/HC ĐHXD tại SGN","category":"Đo lường","group":"QLSL","assignee":"","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Đã được phê duyệt TT chủ trương thực hiện tại SGN và UQ cho GĐ CN TP. HCM thực hiện tiếp các công tác LCNT","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Đã được phê duyệt TT chủ trương thực hiện tại SGN và UQ cho GĐ CN TP. HCM thực hiện tiếp các công tác LCNT","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Theo dõi thực hiện tại SGN","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":64,"title":"Nâng cấp, cải tạo lưu lượng kế xuất","category":"Dự án","group":"QLSL","assignee":"","startDate":"2026-01-01","dueDate":"","status":"progress","progress":55,"priority":"normal","description":"Đã được phê duyệt dự toán + KH LCNT. Đã được phê duyệt các QĐ thành lập tổ. Đã đăng tải KH LCNT trên trang MSC. Đang hoàn thành dự thảo E-HSMT và trình phê duyệt","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Đã được phê duyệt dự toán + KH LCNT. Đã được phê duyệt các QĐ thành lập tổ. Đã đăng tải KH LCNT trên trang MSC. Đang hoàn thành dự thảo E-HSMT và trình phê duyệt","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Đăng tải E-HSMT trước 19/8.\nDự thảo các hồ sơ đánh giá HSDT","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":65,"title":"Lớp đào tạo về kiểm định bể chứa","category":"Đào tạo","group":"QLSL","assignee":"","startDate":"2026-01-01","dueDate":"","status":"progress","progress":95,"priority":"normal","description":"Hoàn thành các thủ tục LCNT","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Hoàn thành các thủ tục LCNT","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Hoàn thành kí HĐ, đang trình phê duyệt tờ trình tạm ứng cho đơn vị đào tạo","updatedAt":"2026-08-07"},{"weekStart":"2026-08-10","weekEnd":"2026-08-15","label":"10/08 – 15/08","result":"Trình hồ sơ thanh toán trong 05 ngày sau khi nhận đủ hồ sơ","updatedAt":"2026-08-15"}],"nextPlan":""},{"id":66,"title":"Quy chế quản lý hao hụt","category":"Quy trình, quy chế","group":"QLSL","assignee":"","startDate":"2026-01-01","dueDate":"","status":"progress","progress":45,"priority":"normal","description":"Đã họp thống nhất với BTH + BKS. Đã gửi mail xin ý kiến với bản dự thảo sau khi chỉnh sửa theo các góp ý","comment":"","createdAt":"2026-01-01","updatedAt":"2026-08-15","weeklyUpdates":[{"weekStart":"2026-07-27","weekEnd":"2026-07-31","label":"27/07 – 31/07","result":"Đã họp thống nhất với BTH + BKS. Đã gửi mail xin ý kiến với bản dự thảo sau khi chỉnh sửa theo các góp ý","updatedAt":"2026-07-31"},{"weekStart":"2026-08-03","weekEnd":"2026-08-07","label":"03/08 – 07/08","result":"Đã thống nhất và chỉnh sửa lại dự thảo QC QLHH theo ý kiến của BTH (lần 2), đã gửi email cho BTH dự thảo QC QLHH","updatedAt":"2026-08-07"}],"nextPlan":""}],"groups":{"CNKB":"Xe & CNKB","KSCL":"Kiểm soát chất lượng","QLSL":"Quản lý SL & Đo lường"},"statusVN":{"done":"Hoàn thành","progress":"Đang thực hiện","plan":"Kế hoạch","late":"Quá hạn","pause":"Tạm dừng"},"weeks":[{"start":"2026-07-27","end":"2026-07-31","label":"27/07 – 31/07"},{"start":"2026-08-03","end":"2026-08-07","label":"03/08 – 07/08"},{"start":"2026-08-10","end":"2026-08-15","label":"10/08 – 15/08"}]};
+</script>
+<script>
+// ═══════════════ PKT Progress Tracker ═══════════════
+let DB, curPage='dashboard', calMonth=7, calYear=2026; // month 7 = August (0-indexed)
+const SEED = window.__SEED__;
+
+const STATUS={
+  done:{vn:'Hoàn thành',cls:'done'}, progress:{vn:'Đang thực hiện',cls:'progress'},
+  plan:{vn:'Kế hoạch',cls:'plan'}, late:{vn:'Quá hạn',cls:'late'}, pause:{vn:'Tạm dừng',cls:'pause'}
+};
+const MONTHS=['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
+
+function load(){ DB=JSON.parse(JSON.stringify(SEED)); }
+function esc(s){return(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+function initials(n){if(!n)return '?';const p=n.trim().split(/[\s,]+/);return (p[p.length-1]||n).slice(0,2).toUpperCase()}
+function toast(m){const t=document.getElementById('toast');t.textContent='✓ '+m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1700)}
+function fmtD(d){if(!d)return '—';const p=d.split('-');return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:d}
+
+// ── derived helpers ──
+function works(){return DB.works}
+function isLate(w){
+  if(w.status==='done')return false;
+  if(!w.dueDate)return false;
+  return new Date(w.dueDate) < new Date('2026-08-17');
+}
+function effStatus(w){return isLate(w)?'late':w.status}
+function lastUpdate(w){
+  if(!w.weeklyUpdates||!w.weeklyUpdates.length)return w.updatedAt||'';
+  return w.weeklyUpdates[w.weeklyUpdates.length-1].weekEnd||w.updatedAt;
+}
+
+// ── KPIs ──
+function computeKPI(list){
+  const total=list.length;
+  const done=list.filter(w=>effStatus(w)==='done').length;
+  const prog=list.filter(w=>effStatus(w)==='progress').length;
+  const plan=list.filter(w=>effStatus(w)==='plan').length;
+  const late=list.filter(w=>effStatus(w)==='late').length;
+  const rate=total?Math.round(done/total*100):0;
+  return {total,done,prog,plan,late,rate};
+}
+
+// ── Filters ──
+function getFiltered(){
+  const q=(document.getElementById('gSearch').value||'').toLowerCase();
+  const cat=document.getElementById('fCat').value;
+  const who=document.getElementById('fWho').value;
+  const st=document.getElementById('fStatus').value;
+  return works().filter(w=>{
+    if(q&&!((w.title+' '+w.assignee+' '+w.category).toLowerCase().includes(q)))return false;
+    if(cat&&w.category!==cat)return false;
+    if(who&&!(w.assignee||'').includes(who))return false;
+    if(st&&effStatus(w)!==st)return false;
+    return true;
+  });
+}
+
+// ═══════════ RENDER: DASHBOARD ═══════════
+function renderDashboard(){
+  const k=computeKPI(works());
+  const ic={
+    total:'<path d="M9 11H3v10h6V11zM21 3h-6v18h6V3zM15 7H9v14h6V7z"/>',
+    done:'<path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+    prog:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+    plan:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>',
+    late:'<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/>',
+    rate:'<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>'
+  };
+  function card(cls,ico,n,l){return `<div class="kpi-card ${cls}"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor">${ico}</svg></div><div class="n">${n}</div><div class="l">${l}</div></div>`}
+  document.getElementById('kpiGrid').innerHTML=
+    card('k-total',ic.total,k.total,'Tổng công việc')+
+    card('k-done',ic.done,k.done,'Hoàn thành')+
+    card('k-prog',ic.prog,k.prog,'Đang thực hiện')+
+    card('k-plan',ic.plan,k.plan,'Kế hoạch')+
+    card('k-late',ic.late,k.late,'Quá hạn')+
+    card('k-rate',ic.rate,k.rate+'%','Tỷ lệ hoàn thành');
+
+  // progress by category (top 8)
+  const byCat={};
+  works().forEach(w=>{(byCat[w.category]=byCat[w.category]||[]).push(w)});
+  const rows=Object.entries(byCat).map(([c,ws])=>{
+    const avg=Math.round(ws.reduce((s,w)=>s+w.progress,0)/ws.length);
+    return {c,avg,n:ws.length};
+  }).sort((a,b)=>b.n-a.n).slice(0,8);
+  const colors=['#1769d2','#20a464','#f59e0b','#7c3aed','#e11d8f','#0891b2','#65a30d','#dc3545'];
+  document.getElementById('dashCat').innerHTML=rows.map((r,i)=>
+    `<div class="bar-row"><div class="bl">${esc(r.c)}</div><div class="btrack"><div class="bfill" style="width:${r.avg}%;background:${colors[i%colors.length]}">${r.avg}%</div></div></div>`
+  ).join('');
+
+  // status distribution donut (simple)
+  document.getElementById('dashStatus').innerHTML=miniStatusChart(computeKPI(works()));
+}
+function miniStatusChart(k){
+  const segs=[['Hoàn thành',k.done,'#20a464'],['Đang thực hiện',k.prog,'#f59e0b'],['Kế hoạch',k.plan,'#1769d2'],['Quá hạn',k.late,'#dc3545']];
+  const tot=k.total||1;
+  let acc=0;const grad=segs.map(([n,v,c])=>{const st=acc/tot*360;acc+=v;const en=acc/tot*360;return `${c} ${st}deg ${en}deg`}).join(',');
+  return `<div style="display:flex;align-items:center;gap:24px;padding:8px 4px">
+    <div style="width:130px;height:130px;border-radius:50%;background:conic-gradient(${grad});position:relative;flex-shrink:0">
+      <div style="position:absolute;inset:26px;background:#fff;border-radius:50%;display:grid;place-items:center">
+        <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--navy)">${k.total}</div><div style="font-size:10px;color:var(--muted)">việc</div></div>
+      </div>
+    </div>
+    <div style="flex:1">${segs.map(([n,v,c])=>`<div style="display:flex;align-items:center;gap:9px;margin-bottom:9px"><span style="width:11px;height:11px;border-radius:3px;background:${c}"></span><span style="font-size:12.5px;flex:1">${n}</span><b style="font-size:13px;color:var(--navy)">${v}</b></div>`).join('')}</div>
+  </div>`;
+}
+
+// ═══════════ RENDER: LIST ═══════════
+let listView='grid';
+function setListView(v){
+  listView=v;
+  document.getElementById('vtGrid').classList.toggle('on',v==='grid');
+  document.getElementById('vtCompact').classList.toggle('on',v==='compact');
+  document.getElementById('listGridWrap').style.display=v==='grid'?'block':'none';
+  document.getElementById('listCompactWrap').style.display=v==='compact'?'block':'none';
+  renderList();
+}
+function renderList(){
+  const list=getFiltered();
+  document.getElementById('listCount').textContent='· '+list.length+' công việc';
+  if(listView==='grid')renderXls(list); else renderCompact(list);
+}
+
+// Excel-style grid: columns = STT | Nội dung | Người | [mỗi tuần 1 cột] | Kế hoạch tuần tới
+function getVisibleWeeks(){
+  const all=DB.weeks||[];
+  const mode=(document.getElementById('weekView')||{}).value||'recent';
+  if(mode==='all')return {mode,cols:all};
+  if(mode==='recent')return {mode,cols:all.slice(-4)};
+  if(mode==='month'){
+    // Gom các tuần theo tháng của weekEnd
+    const groups={};const order=[];
+    all.forEach(wk=>{
+      const d=wk.end?new Date(wk.end):null;
+      const key=d?`Tháng ${d.getMonth()+1}/${d.getFullYear()}`:'Khác';
+      if(!groups[key]){groups[key]=[];order.push(key)}
+      groups[key].push(wk);
+    });
+    return {mode,monthGroups:order.map(k=>({label:k,weeks:groups[k]}))};
+  }
+  return {mode:'recent',cols:all.slice(-4)};
+}
+function weekCellContent(w,wk){
+  const u=(w.weeklyUpdates||[]).find(x=>x.label===wk.label||x.weekEnd===wk.end);
+  return (u&&u.result)?u.result:'';
+}
+function renderXls(list){
+  const tbl=document.getElementById('xlsTable');
+  if(!list.length){tbl.innerHTML='<tr><td><div class="empty"><div class="big">Không có công việc khớp bộ lọc</div></div></td></tr>';return}
+  const vw=getVisibleWeeks();
+  // Xác định các cột tuần hiển thị (mỗi cột là 1 tuần, hoặc 1 tháng gộp)
+  let cols; // [{label, weeks:[wk,...]}]
+  if(vw.mode==='month')cols=vw.monthGroups;
+  else cols=vw.cols.map(wk=>({label:wk.label,weeks:[wk]}));
+
+  let head='<thead><tr><th class="c-stt">STT</th><th class="col-nd">Nội dung công việc</th><th>Người</th>';
+  cols.forEach(c=>head+=`<th>${esc(c.label)}</th>`);
+  head+='<th>Kế hoạch tuần tới</th></tr></thead>';
+
+  const byMang={};const order=[];
+  list.forEach(w=>{if(!byMang[w.category]){byMang[w.category]=[];order.push(w.category)}byMang[w.category].push(w)});
+  let body='<tbody>';
+  const ncol=3+cols.length+1;
+  order.forEach(mang=>{
+    body+=`<tr class="mang-row"><td colspan="${ncol}">${esc(mang)}</td></tr>`;
+    byMang[mang].forEach(w=>{
+      body+=`<tr class="xls-edit" ondblclick="openEdit(${w.id})">`;
+      body+=`<td class="c-stt" onclick="openDetail(${w.id})">${w.id}</td>`;
+      body+=`<td class="c-nd" onclick="openDetail(${w.id})" title="Nhấp đúp để sửa">${esc(w.title)}</td>`;
+      body+=`<td class="c-who">${esc(w.assignee||'—')}</td>`;
+      cols.forEach(c=>{
+        // gộp nội dung các tuần trong cột (nếu là tháng, ghép nhiều tuần)
+        const parts=c.weeks.map(wk=>{
+          const txt=weekCellContent(w,wk);
+          if(!txt)return '';
+          return c.weeks.length>1?`▸ ${wk.label}:\n${txt}`:txt;
+        }).filter(Boolean);
+        if(parts.length){
+          const st=STATUS[effStatus(w)]||STATUS.progress;
+          body+=`<td class="c-week" onclick="openDetail(${w.id})"><span class="wk-badge sb-${st.cls}">${st.vn}</span><div>${esc(parts.join('\n\n'))}</div></td>`;
+        }else{
+          body+=`<td class="c-week wk-cell-empty" onclick="openDetail(${w.id})">—</td>`;
+        }
+      });
+      const lastPlan=w.nextPlan||'';
+      body+=`<td class="c-plan" onclick="openDetail(${w.id})">${lastPlan?esc(lastPlan):'<span class="wk-cell-empty">—</span>'}</td>`;
+      body+='</tr>';
+    });
+  });
+  body+='</tbody>';
+  tbl.innerHTML=head+body;
+}
+function renderCompact(list){
+  if(!list.length){document.getElementById('listBody').innerHTML='<tr><td colspan="8"><div class="empty"><div class="big">Không có công việc khớp bộ lọc</div><div>Thử xóa từ khóa hoặc đổi bộ lọc.</div></div></td></tr>';return}
+  document.getElementById('listBody').innerHTML=list.map(w=>{
+    const es=effStatus(w);const s=STATUS[es];
+    return `<tr onclick="openDetail(${w.id})">
+      <td class="td-stt">${w.id}</td>
+      <td class="td-title">${esc(w.title)}<div class="cat-mini">${esc(w.category)}</div></td>
+      <td><span class="cat-tag">${esc(DB.groups[w.group]||w.group)}</span></td>
+      <td><span class="who-tag"><span class="av">${initials(w.assignee)}</span>${esc(w.assignee||'—')}</span></td>
+      <td><span class="status-badge sb-${s.cls}">${s.vn}</span></td>
+      <td><div class="mini-prog"><div class="track"><div class="fill" style="width:${w.progress}%"></div></div><span class="pv">${w.progress}%</span></div></td>
+      <td class="td-date">${fmtD(w.dueDate)}</td>
+      <td class="td-date">${fmtD(lastUpdate(w))}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════ DETAIL DRAWER ═══════════
+function openDetail(id){
+  const w=works().find(x=>x.id===id);if(!w)return;
+  const es=effStatus(w);const s=STATUS[es];
+  document.getElementById('dNum').textContent=w.id;
+  document.getElementById('dTitle').textContent=w.title;
+  document.getElementById('dStatus').innerHTML=`<span class="status-badge sb-${s.cls}">${s.vn}</span>`;
+  document.getElementById('dMeta').innerHTML=`
+    <div class="mi"><div class="ml">Nhóm</div><div class="mv">${esc(DB.groups[w.group]||w.group)}</div></div>
+    <div class="mi"><div class="ml">Người phụ trách</div><div class="mv">${esc(w.assignee||'—')}</div></div>
+    <div class="mi"><div class="ml">Tiến độ</div><div class="mv">${w.progress}%</div></div>
+    <div class="mi"><div class="ml">Mảng</div><div class="mv">${esc(w.category)}</div></div>
+    <div class="mi"><div class="ml">Hạn hoàn thành</div><div class="mv">${fmtD(w.dueDate)}</div></div>
+    <div class="mi"><div class="ml">Cập nhật cuối</div><div class="mv">${fmtD(lastUpdate(w))}</div></div>`;
+  document.getElementById('dDesc').textContent=w.description||'Chưa có mô tả.';
+
+  // Timeline
+  const wu=w.weeklyUpdates||[];
+  let tl='';
+  wu.forEach(u=>{
+    const bullets=(u.result||'').split('\n').filter(Boolean);
+    tl+=`<div class="tl-item ${w.status}">
+      <div class="tl-week"><span class="wk">${esc(u.label||fmtD(u.weekStart)+' – '+fmtD(u.weekEnd))}</span></div>
+      <div class="tl-body">${bullets.length>1?'<ul>'+bullets.map(b=>`<li>${esc(b.replace(/^[-•]\s*/,''))}</li>`).join('')+'</ul>':esc(u.result||'')}</div></div>`;
+  });
+  // Kế hoạch tuần tới — CHUNG của công việc
+  const lastPlan=w.nextPlan||'';
+  if(lastPlan){
+    const bl=lastPlan.split('\n').filter(Boolean);
+    tl+=`<div class="tl-item next"><div class="tl-week"><span class="wk">Kế hoạch tuần tới</span></div>
+      <div class="tl-body">${bl.length>1?'<ul>'+bl.map(b=>`<li>${esc(b.replace(/^[-•]\s*/,''))}</li>`).join('')+'</ul>':esc(lastPlan)}</div></div>`;
+  }
+  if(!tl)tl='<div class="empty" style="padding:30px"><div>Chưa có cập nhật tuần nào.</div></div>';
+  document.getElementById('dTimeline').innerHTML=tl;
+  document.getElementById('dComment').innerHTML=w.comment?`<div class="cmt-box">💬 ${esc(w.comment)}</div>`:'';
+
+  document.getElementById('drawer').dataset.id=id;
+  document.getElementById('drawer').classList.add('on');
+  document.getElementById('drawerBg').classList.add('on');
+}
+function closeDrawer(){document.getElementById('drawer').classList.remove('on');document.getElementById('drawerBg').classList.remove('on')}
+
+// ═══════════ KANBAN ═══════════
+function renderKanban(){
+  const cols=[['plan','Kế hoạch','c-plan'],['progress','Đang thực hiện','c-progress'],['done','Hoàn thành','c-done'],['late','Quá hạn','c-late']];
+  const list=getFiltered();
+  const kb=document.getElementById('kanban');
+  kb.innerHTML=cols.map(([st,name,cls])=>{
+    const items=list.filter(w=>effStatus(w)===st);
+    return `<div class="kcol ${cls}" data-status="${st}" ondragover="kOver(event)" ondragleave="kLeave(event)" ondrop="kDrop(event,'${st}')">
+      <div class="kcol-head"><span class="dot"></span>${name}<span class="cnt">${items.length}</span></div>
+      ${items.map(w=>kCard(w)).join('')}
+    </div>`;
+  }).join('');
+}
+function kCard(w){
+  return `<div class="kcard" draggable="${ADMIN}" data-id="${w.id}" ${ADMIN?`ondragstart="kStart(event,${w.id})" ondragend="kEnd(event)"`:''} onclick="openDetail(${w.id})">
+    <span class="kcat">${esc(w.category)}</span>
+    <div class="kt">${esc(w.title)}</div>
+    <div class="kmeta"><span>Hạn: ${fmtD(w.dueDate)}</span>${w.priority==='high'?'<span class="prio-flag prio-high">Ưu tiên</span>':''}</div>
+    <div class="kfoot"><span class="kwho"><span class="av">${initials(w.assignee)}</span>${esc(w.assignee||'—')}</span><span class="kprog">${w.progress}%</span></div>
+  </div>`;
+}
+let dragId=null;
+function kStart(e,id){dragId=id;e.target.classList.add('dragging')}
+function kEnd(e){e.target.classList.remove('dragging')}
+function kOver(e){e.preventDefault();e.currentTarget.classList.add('drag-over')}
+function kLeave(e){e.currentTarget.classList.remove('drag-over')}
+function kDrop(e,st){
+  e.preventDefault();e.currentTarget.classList.remove('drag-over');
+  const w=works().find(x=>x.id===dragId);if(!w)return;
+  if(st==='late'){toast('Không thể chuyển thủ công sang Quá hạn');return}
+  w.status=st;
+  if(st==='done')w.progress=100;
+  else if(st==='plan'&&w.progress>10)w.progress=10;
+  else if(st==='progress'&&(w.progress>=100||w.progress<15))w.progress=50;
+  w.updatedAt='2026-08-17';
+  renderKanban();refreshAll();toast('Đã chuyển "'+w.title.slice(0,24)+'…"');
+}
+
+// ═══════════ CALENDAR ═══════════
+function renderCalendar(){
+  document.getElementById('calTitle').textContent=MONTHS[calMonth]+' / '+calYear;
+  const first=new Date(calYear,calMonth,1);
+  let startDow=(first.getDay()+6)%7; // Mon=0
+  const daysIn=new Date(calYear,calMonth+1,0).getDate();
+  const prevDays=new Date(calYear,calMonth,0).getDate();
+  const dows=['T2','T3','T4','T5','T6','T7','CN'];
+  let html=dows.map((d,i)=>`<div class="cal-dow ${i===6?'sun':''} ${i===5?'sat':''}">${d}</div>`).join('');
+  // Events: place works on their dueDate + weekly update ends
+  const evs={};
+  works().forEach(w=>{
+    if(w.dueDate){const d=new Date(w.dueDate);if(d.getMonth()===calMonth&&d.getFullYear()===calYear){(evs[d.getDate()]=evs[d.getDate()]||[]).push({t:w.title,s:effStatus(w),id:w.id})}}
+    (w.weeklyUpdates||[]).forEach(u=>{if(u.weekEnd){const d=new Date(u.weekEnd);if(d.getMonth()===calMonth&&d.getFullYear()===calYear){(evs[d.getDate()]=evs[d.getDate()]||[]).push({t:w.title,s:effStatus(w),id:w.id})}}});
+  });
+  const today=new Date('2026-08-17');
+  for(let i=0;i<startDow;i++)html+=`<div class="cal-cell other"><div class="dn">${prevDays-startDow+i+1}</div></div>`;
+  for(let d=1;d<=daysIn;d++){
+    const isToday=(d===today.getDate()&&calMonth===today.getMonth()&&calYear===today.getFullYear());
+    const dayEvs=(evs[d]||[]).slice(0,3);
+    html+=`<div class="cal-cell ${isToday?'today':''}"><div class="dn">${d}</div>${dayEvs.map(e=>`<div class="cal-ev ev-${e.s}" onclick="openDetail(${e.id})" title="${esc(e.t)}">${esc(e.t.slice(0,20))}</div>`).join('')}${(evs[d]||[]).length>3?`<div style="font-size:10px;color:var(--muted)">+${evs[d].length-3} nữa</div>`:''}</div>`;
+  }
+  const cells=startDow+daysIn;const trail=(7-cells%7)%7;
+  for(let i=1;i<=trail;i++)html+=`<div class="cal-cell other"><div class="dn">${i}</div></div>`;
+  document.getElementById('calGrid').innerHTML=html;
+}
+function calNav(dir){calMonth+=dir;if(calMonth<0){calMonth=11;calYear--}if(calMonth>11){calMonth=0;calYear++}renderCalendar()}
+function calToday(){calMonth=7;calYear=2026;renderCalendar()}
+
+// ═══════════ REPORTS ═══════════
+function renderReports(){
+  // By category
+  const byCat={};
+  works().forEach(w=>{(byCat[w.category]=byCat[w.category]||[]).push(w)});
+  const catRows=Object.entries(byCat).map(([c,ws])=>({c,avg:Math.round(ws.reduce((s,w)=>s+w.progress,0)/ws.length),n:ws.length})).sort((a,b)=>b.n-a.n);
+  const colors=['#1769d2','#20a464','#f59e0b','#7c3aed','#e11d8f','#0891b2','#65a30d','#dc3545','#0d9488','#c2410c'];
+  document.getElementById('repCat').innerHTML=catRows.map((r,i)=>
+    `<div class="bar-row"><div class="bl">${esc(r.c)} <span style="color:var(--muted);font-weight:500">(${r.n})</span></div><div class="btrack"><div class="bfill" style="width:${r.avg}%;background:${colors[i%colors.length]}">${r.avg}%</div></div></div>`
+  ).join('');
+
+  // By person
+  const byP={};
+  works().forEach(w=>{(w.assignee||'—').split(',').map(x=>x.trim()).forEach(p=>{if(!p)return;const o=byP[p]=byP[p]||{total:0,done:0,prog:0,late:0};o.total++;const es=effStatus(w);if(es==='done')o.done++;else if(es==='late')o.late++;else if(es==='progress')o.prog++})});
+  const pRows=Object.entries(byP).sort((a,b)=>b[1].total-a[1].total);
+  document.getElementById('repPerson').innerHTML=`<table class="person-tbl"><thead><tr><th>Người phụ trách</th><th class="num">Tổng</th><th class="num">Hoàn thành</th><th class="num">Đang làm</th><th class="num">Quá hạn</th></tr></thead><tbody>${pRows.map(([p,o])=>`<tr><td><span class="who-tag"><span class="av">${initials(p)}</span>${esc(p)}</span></td><td class="num">${o.total}</td><td class="num" style="color:var(--green)">${o.done}</td><td class="num" style="color:var(--orange)">${o.prog}</td><td class="num" style="color:var(--red)">${o.late||''}</td></tr>`).join('')}</tbody></table>`;
+
+  // Weekly trend (count works with updates per week + completed)
+  const weeks=DB.weeks||[];
+  const trend=weeks.map(wk=>{
+    let updated=0,done=0;
+    works().forEach(w=>{(w.weeklyUpdates||[]).forEach(u=>{if(u.weekEnd===wk.end){updated++;if(effStatus(w)==='done')done++}})});
+    return {label:wk.label.split(' – ')[1]||wk.label,updated,done};
+  });
+  const maxV=Math.max(1,...trend.map(t=>t.updated));
+  document.getElementById('repTrend').innerHTML=`<div class="trend-chart">${trend.map(t=>`
+    <div class="trend-col"><div class="trend-bars">
+      <div class="tb" style="height:${t.updated/maxV*160}px;background:#1769d2" title="Cập nhật: ${t.updated}"></div>
+      <div class="tb" style="height:${t.done/maxV*160}px;background:#20a464" title="Hoàn thành: ${t.done}"></div>
+    </div><div class="trend-lbl">${t.label}</div></div>`).join('')}</div>
+    <div style="display:flex;gap:20px;justify-content:center;margin-top:10px;font-size:12px"><span><span style="display:inline-block;width:11px;height:11px;background:#1769d2;border-radius:3px;margin-right:5px"></span>Cập nhật</span><span><span style="display:inline-block;width:11px;height:11px;background:#20a464;border-radius:3px;margin-right:5px"></span>Hoàn thành</span></div>`;
+}
+
+// ═══════════ NAV ═══════════
+function goto(page){
+  curPage=page;
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.toggle('on',b.dataset.page===page));
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id==='page-'+page));
+  const titles={dashboard:'Tổng quan',list:'Danh sách công việc',kanban:'Bảng Kanban',calendar:'Lịch công việc',reports:'Báo cáo',docs:'Tài liệu',remind:'Nhắc việc',settings:'Cài đặt'};
+  refreshAll();
+}
+function refreshAll(){
+  if(curPage==='dashboard')renderDashboard();
+  if(curPage==='list')renderList();
+  if(curPage==='kanban')renderKanban();
+  if(curPage==='calendar')renderCalendar();
+  if(curPage==='reports')renderReports();
+  if(curPage==='remind')renderRemind();
+}
+function renderRemind(){
+  // Overdue + due-soon works
+  const today=new Date('2026-08-17');
+  const soon=new Date('2026-08-24');
+  const late=works().filter(w=>effStatus(w)==='late');
+  const dueSoon=works().filter(w=>w.status!=='done'&&w.dueDate&&new Date(w.dueDate)>=today&&new Date(w.dueDate)<=soon);
+  const stale=works().filter(w=>{const lu=lastUpdate(w);return w.status!=='done'&&lu&&new Date(lu)<new Date('2026-08-10')});
+  function block(title,items,color,icon){
+    if(!items.length)return '';
+    return `<div style="margin-bottom:22px"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:${color};margin-bottom:10px">${icon} ${title} <span style="background:${color};color:#fff;font-size:11px;padding:1px 9px;border-radius:12px">${items.length}</span></div>${items.map(w=>`<div onclick="openDetail(${w.id})" style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:#fff;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer"><span class="cat-tag">${esc(w.category)}</span><div style="flex:1;font-weight:600;font-size:13px">${esc(w.title)}</div><span class="who-tag"><span class="av">${initials(w.assignee)}</span>${esc(w.assignee||'—')}</span><span class="td-date">Hạn: ${fmtD(w.dueDate)}</span></div>`).join('')}</div>`;
+  }
+  const html=block('Đã quá hạn',late,'#dc3545','⚠')+block('Sắp đến hạn (trong 7 ngày)',dueSoon,'#f59e0b','⏰')+block('Lâu chưa cập nhật',stale,'#718096','🕐');
+  document.getElementById('remindBody').innerHTML=html||'<div class="empty"><div class="big">Không có nhắc việc</div><div>Mọi công việc đều đúng tiến độ.</div></div>';
+}
+
+// ═══════════ ADD / UPDATE FORMS ═══════════
+function openAdd(){
+  document.getElementById('addForm').reset();
+  document.getElementById('modalAdd').classList.add('on');
+}
+function saveAdd(){
+  const g=document.getElementById('aGroup').value;
+  const maxId=Math.max(0,...works().map(w=>w.id));
+  const rec={
+    id:maxId+1,title:document.getElementById('aTitle').value.trim(),
+    category:document.getElementById('aCat').value.trim()||'Khác',group:g,
+    assignee:document.getElementById('aWho').value.trim(),
+    startDate:document.getElementById('aStart').value||'2026-01-01',
+    dueDate:document.getElementById('aDue').value||'',
+    status:'plan',progress:0,priority:document.getElementById('aPrio').value,
+    description:document.getElementById('aDesc').value.trim(),
+    comment:'',createdAt:'2026-08-17',updatedAt:'2026-08-17',
+    weeklyUpdates:[]
+  };
+  if(!rec.title){toast('Nhập nội dung công việc');return}
+  rec.nextPlan=document.getElementById('aPlan').value.trim();
+  works().push(rec);
+  document.getElementById('modalAdd').classList.remove('on');
+  refreshAll();populateFilters();toast('Đã thêm công việc');
+}
+
+function openUpdate(){
+  const id=parseInt(document.getElementById('drawer').dataset.id);
+  const w=works().find(x=>x.id===id);if(!w)return;
+  document.getElementById('uWorkId').value=id;
+  document.getElementById('uWorkName').textContent=w.title;
+  // build week picker from existing weeks + option to add new
+  const wu=w.weeklyUpdates||[];
+  let opts=wu.map((u,i)=>`<option value="${i}">${esc(u.label||('Tuần '+(i+1)))}</option>`).join('');
+  opts+='<option value="new">➕ Thêm tuần mới…</option>';
+  document.getElementById('uWeekPick').innerHTML=opts;
+  // default: select the latest week
+  document.getElementById('uWeekPick').value=wu.length?String(wu.length-1):'new';
+  onWeekPick();
+  document.getElementById('uProgress').value=w.progress;
+  document.getElementById('uProgVal').textContent=w.progress+'%';
+  document.getElementById('uStatus').value=w.status;
+  document.getElementById('uNext').value=w.nextPlan||'';
+  document.getElementById('modalUpdate').classList.add('on');
+}
+function onWeekPick(){
+  const id=parseInt(document.getElementById('uWorkId').value);
+  const w=works().find(x=>x.id===id);if(!w)return;
+  const pick=document.getElementById('uWeekPick').value;
+  if(pick==='new'){
+    document.getElementById('uResult').value='';
+  }else{
+    const u=w.weeklyUpdates[parseInt(pick)];
+    document.getElementById('uResult').value=u?u.result||'':'';
+  }
+}
+function saveUpdate(){
+  const id=parseInt(document.getElementById('uWorkId').value);
+  const w=works().find(x=>x.id===id);if(!w)return;
+  const pick=document.getElementById('uWeekPick').value;
+  const result=document.getElementById('uResult').value.trim();
+  w.weeklyUpdates=w.weeklyUpdates||[];
+  if(pick==='new'){
+    // Thêm tuần mới: nối tiếp sau tuần cuối, tạo cột mới trong bảng
+    let ws='',we='',label='Tuần mới';
+    const last=w.weeklyUpdates[w.weeklyUpdates.length-1];
+    if(last&&last.weekEnd){
+      const d=new Date(last.weekEnd);d.setDate(d.getDate()+3);
+      const s=new Date(d);const e=new Date(d);e.setDate(e.getDate()+4);
+      ws=s.toISOString().slice(0,10);we=e.toISOString().slice(0,10);
+      label=`${fmtD(ws)} – ${fmtD(we)}`;
+    }
+    w.weeklyUpdates.push({weekStart:ws,weekEnd:we,label,result,updatedAt:we||'2026-08-17'});
+    // đăng ký cột tuần mới vào DB.weeks (nếu chưa có) để bảng hiển thị
+    if(we&&!(DB.weeks||[]).some(x=>x.label===label)){
+      DB.weeks=DB.weeks||[];DB.weeks.push({start:ws,end:we,label});
+    }
+  }else{
+    // Ghi đè tuần đang chọn — KHÔNG thêm cột mới
+    const u=w.weeklyUpdates[parseInt(pick)];
+    if(u){u.result=result;u.updatedAt='2026-08-17'}
+  }
+  // trạng thái + tiến độ + kế hoạch là CHUNG của công việc
+  w.progress=parseInt(document.getElementById('uProgress').value);
+  w.status=document.getElementById('uStatus').value;
+  w.nextPlan=document.getElementById('uNext').value.trim();
+  w.updatedAt='2026-08-17';
+  document.getElementById('modalUpdate').classList.remove('on');
+  openDetail(id);refreshAll();toast(pick==='new'?'Đã thêm tuần mới':'Đã cập nhật tuần');
+}
+
+// ═══════════ EDIT WORK ═══════════
+function openEditFromDrawer(){
+  const id=parseInt(document.getElementById('drawer').dataset.id);
+  openEdit(id);
+}
+function openEdit(id){
+  const w=works().find(x=>x.id===id);if(!w)return;
+  document.getElementById('eId').value=id;
+  document.getElementById('eTitle').value=w.title||'';
+  document.getElementById('eGroup').value=w.group||'CNKB';
+  document.getElementById('eCat').value=w.category||'';
+  document.getElementById('eWho').value=w.assignee||'';
+  document.getElementById('ePrio').value=w.priority||'normal';
+  document.getElementById('eDue').value=w.dueDate||'';
+  document.getElementById('eStatus').value=w.status||'progress';
+  document.getElementById('eProgress').value=w.progress||0;
+  document.getElementById('eProgVal').textContent=(w.progress||0)+'%';
+  document.getElementById('eDesc').value=w.description||'';
+  document.getElementById('eComment').value=w.comment||'';
+  document.getElementById('eNextPlan').value=w.nextPlan||'';
+  renderEditWeeks(w);
+  document.getElementById('modalEdit').classList.add('on');
+}
+function renderEditWeeks(w){
+  const wrap=document.getElementById('eWeekList');
+  const wu=w.weeklyUpdates||[];
+  if(!wu.length){wrap.innerHTML='<div style="font-size:12px;color:var(--muted);padding:6px 0">Chưa có bản ghi tuần nào.</div>';return}
+  wrap.innerHTML=wu.map((u,i)=>`
+    <div style="border:1px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:#fbfcfe">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <b style="font-size:12.5px;color:var(--navy)">${esc(u.label||('Tuần '+(i+1)))}</b>
+        <button class="btn btn-ghost" style="padding:3px 10px;font-size:11px;color:var(--red)" onclick="delWeek(${i})">Xóa tuần</button>
+      </div>
+      <textarea data-wi="${i}" data-wf="result" style="width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:7px;font-size:12px;font-family:inherit;min-height:52px">${esc(u.result||'')}</textarea>
+    </div>`).join('');
+}
+function delWeek(i){
+  const id=parseInt(document.getElementById('eId').value);
+  const w=works().find(x=>x.id===id);if(!w)return;
+  if(confirm('Xóa bản ghi tuần này?')){w.weeklyUpdates.splice(i,1);renderEditWeeks(w);toast('Đã xóa bản ghi tuần')}
+}
+function saveEdit(){
+  const id=parseInt(document.getElementById('eId').value);
+  const w=works().find(x=>x.id===id);if(!w)return;
+  const title=document.getElementById('eTitle').value.trim();
+  if(!title){toast('Nhập nội dung công việc');return}
+  w.title=title;
+  w.group=document.getElementById('eGroup').value;
+  w.category=document.getElementById('eCat').value.trim()||'Khác';
+  w.assignee=document.getElementById('eWho').value.trim();
+  w.priority=document.getElementById('ePrio').value;
+  w.dueDate=document.getElementById('eDue').value;
+  w.status=document.getElementById('eStatus').value;
+  w.progress=parseInt(document.getElementById('eProgress').value);
+  w.description=document.getElementById('eDesc').value.trim();
+  w.comment=document.getElementById('eComment').value.trim();
+  w.nextPlan=document.getElementById('eNextPlan').value.trim();
+  // save week edits from inputs (chỉ còn result)
+  document.querySelectorAll('#eWeekList [data-wi]').forEach(el=>{
+    const i=parseInt(el.dataset.wi),f=el.dataset.wf;
+    if(w.weeklyUpdates[i])w.weeklyUpdates[i][f]=el.value;
+  });
+  w.updatedAt='2026-08-17';
+  document.getElementById('modalEdit').classList.remove('on');
+  if(document.getElementById('drawer').classList.contains('on'))openDetail(id);
+  refreshAll();populateFilters();toast('Đã lưu thay đổi');
+}
+function deleteWork(){
+  const id=parseInt(document.getElementById('eId').value);
+  if(confirm('Xóa hẳn công việc này? Không thể hoàn tác.')){
+    const idx=works().findIndex(x=>x.id===id);
+    if(idx>=0)works().splice(idx,1);
+    document.getElementById('modalEdit').classList.remove('on');
+    closeDrawer();refreshAll();populateFilters();toast('Đã xóa công việc');
+  }
+}
+
+// ═══════════ EXPORT ═══════════
+function exportExcel(){
+  const rows=[['ID','Nhóm','Mảng','Nội dung','Người phụ trách','Trạng thái','Tiến độ %','Hạn','Cập nhật cuối','Số tuần cập nhật','Kế hoạch tuần tới']];
+  works().forEach(w=>{
+    const lastPlan=w.nextPlan||'';
+    rows.push([w.id,DB.groups[w.group]||w.group,w.category,w.title,w.assignee,STATUS[effStatus(w)].vn,w.progress,fmtD(w.dueDate),fmtD(lastUpdate(w)),(w.weeklyUpdates||[]).length,lastPlan]);
+  });
+  const csv='\ufeff'+rows.map(r=>r.map(c=>'"'+String(c==null?'':c).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  const b=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);
+  a.download='PKT_TienDo_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+  toast('Đã xuất Excel (CSV)');
+}
+
+// ═══════════ INIT ═══════════
+function populateFilters(){
+  const cats=[...new Set(works().map(w=>w.category))].sort();
+  const whos=[...new Set(works().flatMap(w=>(w.assignee||'').split(',').map(x=>x.trim())).filter(Boolean))].sort();
+  document.getElementById('fCat').innerHTML='<option value="">Tất cả mảng</option>'+cats.map(c=>`<option>${esc(c)}</option>`).join('');
+  document.getElementById('fWho').innerHTML='<option value="">Mọi người phụ trách</option>'+whos.map(w=>`<option>${esc(w)}</option>`).join('');
+  // add form category datalist
+  document.getElementById('catList').innerHTML=cats.map(c=>`<option value="${esc(c)}">`).join('');
+}
+function initEvents(){
+  ['gSearch','fCat','fWho','fStatus'].forEach(id=>{
+    document.getElementById(id).addEventListener('input',()=>{if(curPage==='list')renderList();if(curPage==='kanban')renderKanban()});
+  });
+  document.getElementById('uProgress').addEventListener('input',e=>document.getElementById('uProgVal').textContent=e.target.value+'%');
+  document.getElementById('eProgress').addEventListener('input',e=>document.getElementById('eProgVal').textContent=e.target.value+'%');
+  document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('on')}));
+  document.getElementById('drawerBg').addEventListener('click',closeDrawer);
+}
+
+// ═══════════ CHẾ ĐỘ XEM / QUẢN LÝ ═══════════
+let ADMIN=true;
+function toggleAdmin(){
+  if(!ADMIN){
+    const pw=prompt('Nhập mã quản lý để bật chế độ chỉnh sửa:');
+    if(pw===null)return;
+    if(pw!=='pkt2026'){toast('Mã không đúng');return}
+    ADMIN=true;
+  }else{ADMIN=false}
+  applyMode();
+  toast(ADMIN?'Đã bật chế độ Quản lý — có thể sửa & xuất dữ liệu':'Đã chuyển về chế độ Xem');
+}
+function applyMode(){
+  document.body.classList.toggle('view-only',!ADMIN);
+  const btn=document.getElementById('modeBtn');
+  if(btn)btn.innerHTML=ADMIN
+    ?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/></svg>Chế độ: Quản lý'
+    :'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Chế độ: Xem';
+  refreshAll();
+}
+
+// ═══════════ TẢI DỮ LIỆU TỪ data.json ═══════════
+function initData(seed){
+  window.__LOADED__=seed;
+  DB=JSON.parse(JSON.stringify(seed));
+  populateFilters();initEvents();applyMode();goto('dashboard');
+}
+function bootstrap(){
+  fetch('data.json?t='+Date.now())
+    .then(r=>{if(!r.ok)throw new Error('no file');return r.json()})
+    .then(d=>initData(d))
+    .catch(()=>{
+      // fallback: dữ liệu rỗng + thông báo
+      document.getElementById('kpiGrid')&&(document.getElementById('kpiGrid').innerHTML='');
+      initData(SEED);
+      toast('Chưa tải được data.json — kiểm tra file cùng thư mục');
+    });
+}
+
+// ═══════════ NHẬP / XUẤT data.json ═══════════
+function exportData(){
+  const clean={works:DB.works,groups:DB.groups,statusVN:DB.statusVN||{},weeks:DB.weeks};
+  const blob=new Blob([JSON.stringify(clean,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='data.json';a.click();
+  toast('Đã xuất data.json — thay file này trên GitHub để cập nhật');
+}
+function importData(ev){
+  const f=ev.target.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=e=>{try{const d=JSON.parse(e.target.result);DB=d;window.__LOADED__=JSON.parse(JSON.stringify(d));populateFilters();refreshAll();toast('Đã nạp dữ liệu từ file')}catch(err){toast('File không hợp lệ')}};
+  rd.readAsText(f);
+  ev.target.value='';
+}
+
+load();initData(SEED);
+
+</script>
+</body>
+</html>

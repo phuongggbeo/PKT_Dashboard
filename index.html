@@ -1,95 +1,462 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PKT Portal - Phòng Kỹ thuật</title>
-<link rel="stylesheet" href="./assets/css/portal.css">
-</head>
-<body>
-<div class="layout">
-  <aside class="sidebar">
-    <div>
-      <div class="brand"><div class="logo">PA</div><div><b>PETROLIMEX AVIATION</b><span>PHÒNG KỸ THUẬT</span></div></div>
-      <nav>
-        <a class="active" href="./">⌂ <span>Tổng quan</span></a>
-        <a href="./tien-do/">☷ <span>Quản lý tiến độ</span></a>
-        <a href="./hao-hut/">▥ <span>Quản lý số lượng</span></a>
-        <a href="./ptd/">▣ <span>Quản lý PTĐ</span></a>
-      </nav>
-      <hr>
-      <nav>
-        <a href="#alerts">♢ <span>Thông báo</span><em>3</em></a>
-        <a href="#calendar">□ <span>Lịch công việc</span></a>
-        <a href="#reports">▤ <span>Báo cáo</span></a>
-        <a href="#docs">▱ <span>Tài liệu</span></a>
-      </nav>
-    </div>
-    <div class="collapse">‹ Thu gọn</div>
-  </aside>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal Phòng Kỹ thuật - Petrolimex Aviation</title>
 
-  <main>
-    <header>
-      <div><small>CỔNG ỨNG DỤNG NỘI BỘ</small><h1>PHÒNG KỸ THUẬT</h1></div>
-      <div class="user">🔔 <span>Nguyễn Thủy Phương<br><small>Chuyên viên</small></span></div>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      color: #0b2d66;
+      overflow-x: hidden;
+
+      background:
+        linear-gradient(
+          rgba(235, 246, 255, 0.76),
+          rgba(229, 242, 251, 0.72)
+        ),
+        url("./assets/img/airport-bg.jpg");
+
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+    .portal {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* =========================
+       HEADER
+    ========================== */
+
+    .portal-header {
+      text-align: center;
+      padding: 54px 20px 24px;
+    }
+
+    .logo-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .company-logo {
+      width: min(520px, 82vw);
+      height: auto;
+      display: block;
+    }
+
+    .portal-title {
+      font-size: clamp(30px, 3vw, 48px);
+      line-height: 1.1;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #0b2d66;
+      margin-top: 8px;
+    }
+
+    .portal-subtitle {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #143f7a;
+    }
+
+    .portal-subtitle::before,
+    .portal-subtitle::after {
+      content: "";
+      width: 34px;
+      height: 3px;
+      border-radius: 999px;
+      background: #f58220;
+    }
+
+    /* =========================
+       MAIN
+    ========================== */
+
+    .portal-main {
+      flex: 1;
+      width: min(1320px, calc(100% - 40px));
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 0 50px;
+    }
+
+    .module-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .module-card {
+      position: relative;
+      min-height: 180px;
+
+      display: flex;
+      align-items: center;
+      gap: 22px;
+
+      padding: 28px;
+
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 18px;
+
+      text-decoration: none;
+      color: inherit;
+
+      box-shadow:
+        0 14px 32px rgba(17, 52, 94, 0.15);
+
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .module-card::after {
+      content: "";
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 0;
+      height: 4px;
+      border-radius: 8px 8px 0 0;
+      background: #f58220;
+    }
+
+    .module-card:hover {
+      transform: translateY(-6px);
+      box-shadow:
+        0 20px 42px rgba(17, 52, 94, 0.22);
+
+      border-color: rgba(245, 130, 32, 0.45);
+    }
+
+    .module-icon {
+      width: 78px;
+      height: 78px;
+      flex: 0 0 78px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 50%;
+
+      color: white;
+      font-size: 34px;
+      font-weight: 700;
+
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 7px 18px rgba(0, 0, 0, 0.12);
+    }
+
+    .progress-icon {
+      background: linear-gradient(135deg, #1b6ed2, #1f4da1);
+    }
+
+    .loss-icon {
+      background: linear-gradient(135deg, #36b977, #17915d);
+    }
+
+    .measure-icon {
+      background: linear-gradient(135deg, #7651db, #552fc5);
+    }
+
+    .module-content {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .module-title {
+      font-size: 19px;
+      line-height: 1.35;
+      font-weight: 800;
+      color: #0b2d66;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .module-desc {
+      font-size: 14px;
+      line-height: 1.65;
+      color: #4f6177;
+    }
+
+    .module-arrow {
+      flex: 0 0 auto;
+      font-size: 30px;
+      color: #466887;
+      transition: transform 0.2s ease;
+    }
+
+    .module-card:hover .module-arrow {
+      transform: translateX(4px);
+      color: #f58220;
+    }
+
+    /* =========================
+       FOOTER
+    ========================== */
+
+    .portal-footer {
+      width: 100%;
+      padding: 18px 20px 22px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+
+      background: rgba(9, 39, 82, 0.75);
+      backdrop-filter: blur(4px);
+    }
+
+    .footer-icon {
+      opacity: 0.9;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================== */
+
+    @media (max-width: 1050px) {
+      .module-grid {
+        grid-template-columns: 1fr;
+        max-width: 720px;
+        margin: 0 auto;
+      }
+
+      .module-card {
+        min-height: 150px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .portal-header {
+        padding-top: 34px;
+      }
+
+      .portal-main {
+        width: min(100% - 24px, 1320px);
+        padding-top: 10px;
+      }
+
+      .module-card {
+        padding: 22px 18px;
+        gap: 16px;
+      }
+
+      .module-icon {
+        width: 62px;
+        height: 62px;
+        flex-basis: 62px;
+        font-size: 28px;
+      }
+
+      .module-title {
+        font-size: 16px;
+      }
+
+      .module-desc {
+        font-size: 13px;
+      }
+
+      .module-arrow {
+        font-size: 24px;
+      }
+
+      .portal-subtitle {
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="portal">
+
+    <!-- =========================
+         HEADER
+    ========================== -->
+    <header class="portal-header">
+
+      <!--
+        Đặt ảnh logo bạn gửi vào:
+        assets/img/petrolimex-aviation-logo.jpg
+
+        Nếu tên file khác, sửa src bên dưới.
+      -->
+      <div class="logo-wrap">
+        <img
+          src="./assets/img/petrolimex-aviation-logo.jpg"
+          alt="Petrolimex Nhiên liệu bay"
+          class="company-logo"
+        />
+      </div>
+
+      <h1 class="portal-title">
+        PORTAL PHÒNG KỸ THUẬT
+      </h1>
+
+      <div class="portal-subtitle">
+        Petrolimex Aviation
+      </div>
+
     </header>
 
-    <div class="content">
-      <section class="welcome">
-        <div><h2>Chào mừng trở lại!</h2><p id="dateText">Tổng quan hoạt động Phòng Kỹ thuật</p></div>
-        <button onclick="location.reload()">↻ Làm mới</button>
-      </section>
 
-      <section class="kpis">
-        <div class="kpi"><i class="blue">☑</i><div><b>124</b><span>Công việc đang theo dõi</span><small class="good">↑ 12 so với tuần trước</small></div></div>
-        <div class="kpi"><i class="red">◷</i><div><b class="danger">32</b><span>Công việc quá hạn</span><small class="good">↓ 5 so với tuần trước</small></div></div>
-        <div class="kpi"><i class="amber">□</i><div><b class="warning">18</b><span>Công việc sắp đến hạn</span><small>Trong 7 ngày tới</small></div></div>
-        <div class="kpi"><i class="green">✓</i><div><b class="success">74%</b><span>Tiến độ hoàn thành chung</span><small class="good">↑ 6% so với tháng trước</small></div></div>
-        <div class="kpi"><i class="blue">▥</i><div><b>0.108%</b><span>Hao hụt toàn công ty</span><small>Định mức ≤ 0.22%</small></div></div>
-      </section>
+    <!-- =========================
+         3 MODULE CHÍNH
+    ========================== -->
+    <main class="portal-main">
 
-      <section class="modules">
-        <a class="module blue-card" href="./tien-do/">
-          <div class="module-top"><div><small>QUẢN LÝ</small><h3>TIẾN ĐỘ CÔNG VIỆC</h3><p>Theo dõi tiến độ công việc, kế hoạch hàng tuần, phân công và báo cáo.</p></div><div class="art">🎯</div></div>
-          <div class="stats"><div><b>32</b><span>Quá hạn</span></div><div><b>18</b><span>Sắp đến hạn</span></div><div><b>74%</b><span>Hoàn thành</span></div></div>
-          <div class="cta">Truy cập hệ thống <span>→</span></div>
+      <div class="module-grid">
+
+        <!-- QUẢN LÝ TIẾN ĐỘ -->
+        <a
+          href="./tien-do/"
+          class="module-card"
+          title="Mở hệ thống quản lý tiến độ công việc"
+        >
+
+          <div class="module-icon progress-icon">
+            ✓
+          </div>
+
+          <div class="module-content">
+
+            <h2 class="module-title">
+              Theo dõi tiến độ công việc
+            </h2>
+
+            <p class="module-desc">
+              Quản lý và theo dõi tiến độ công việc,
+              kế hoạch tuần và người phụ trách.
+            </p>
+
+          </div>
+
+          <div class="module-arrow">
+            →
+          </div>
+
         </a>
 
-        <a class="module green-card" href="./hao-hut/">
-          <div class="module-top"><div><small>QUẢN LÝ</small><h3>SỐ LƯỢNG & HAO HỤT</h3><p>Theo dõi nhập, xuất, tồn kho và hao hụt hàng ngày tại các chi nhánh.</p></div><div class="art">📊</div></div>
-          <div class="stats"><div><b>0.108%</b><span>Hao hụt hôm nay</span></div><div><b>7/8</b><span>Chi nhánh báo cáo</span></div><div><b>0.22%</b><span>Định mức</span></div></div>
-          <div class="cta">Truy cập hệ thống <span>→</span></div>
+
+        <!-- QUẢN LÝ HAO HỤT -->
+        <a
+          href="./hao-hut/"
+          class="module-card"
+          title="Mở hệ thống quản lý số lượng và hao hụt"
+        >
+
+          <div class="module-icon loss-icon">
+            ▥
+          </div>
+
+          <div class="module-content">
+
+            <h2 class="module-title">
+              Tổng hợp hao hụt
+            </h2>
+
+            <p class="module-desc">
+              Theo dõi và tổng hợp số liệu hao hụt
+              hàng ngày theo chi nhánh và định mức.
+            </p>
+
+          </div>
+
+          <div class="module-arrow">
+            →
+          </div>
+
         </a>
 
-        <a class="module orange-card" href="./ptd/">
-          <div class="module-top"><div><small>QUẢN LÝ</small><h3>PHƯƠNG TIỆN ĐO</h3><p>Quản lý phương tiện đo, lịch kiểm định/hiệu chuẩn và cảnh báo quá hạn.</p></div><div class="art">⏱️</div></div>
-          <div class="stats"><div><b>85</b><span>Sắp đến hạn</span></div><div><b>32</b><span>Quá hạn</span></div><div><b>1,154</b><span>Tổng PTĐ</span></div></div>
-          <div class="cta">Truy cập hệ thống <span>→</span></div>
+
+        <!-- QUẢN LÝ PTĐ -->
+        <a
+          href="./ptd/"
+          class="module-card"
+          title="Mở hệ thống quản lý phương tiện đo"
+        >
+
+          <div class="module-icon measure-icon">
+            ◴
+          </div>
+
+          <div class="module-content">
+
+            <h2 class="module-title">
+              Quản lý phương tiện đo
+            </h2>
+
+            <p class="module-desc">
+              Quản lý phương tiện đo, kiểm định,
+              hiệu chuẩn và theo dõi thời hạn.
+            </p>
+
+          </div>
+
+          <div class="module-arrow">
+            →
+          </div>
+
         </a>
-      </section>
 
-      <section class="bottom">
-        <div class="panel" id="alerts">
-          <div class="panel-head"><b>CÔNG VIỆC QUÁ HẠN (MỚI NHẤT)</b><a href="./tien-do/">Xem tất cả</a></div>
-          <div class="row"><i></i><span>Kiểm tra, bảo trì hệ thống thiết bị điện tại Cảng HK Nội Bài</span><b>10 ngày</b><small>P. Kỹ thuật điện</small></div>
-          <div class="row"><i></i><span>Triển khai kế hoạch kiểm tra, bảo dưỡng xe tra nạp nhiên liệu</span><b>7 ngày</b><small>P. Xe & CN kho bể</small></div>
-          <div class="row"><i></i><span>Hoàn thiện hồ sơ kiểm định PTĐ quý II/2026</span><b>5 ngày</b><small>P. Đo lường</small></div>
-          <div class="row"><i></i><span>Rà soát hao hụt bất thường tại Chi nhánh Cam Ranh</span><b>3 ngày</b><small>P. Số lượng</small></div>
-        </div>
+      </div>
 
-        <div class="panel" id="calendar">
-          <div class="panel-head"><b>LỊCH CÔNG VIỆC SẮP TỚI</b><a href="#">Xem lịch đầy đủ</a></div>
-          <div class="event"><div><b>19</b><small>THG 8</small></div><span><b>Họp giao ban Phòng Kỹ thuật</b><small>08:30 - 10:00 · Phòng họp PKT</small></span></div>
-          <div class="event"><div><b>21</b><small>THG 8</small></div><span><b>Kiểm tra định kỳ hệ thống hydrant tại SGN</b><small>09:00 - 12:00 · Chi nhánh Tân Sơn Nhất</small></span></div>
-          <div class="event"><div><b>23</b><small>THG 8</small></div><span><b>Rà soát số liệu hao hụt tuần</b><small>14:00 - 16:00 · P. Số lượng</small></span></div>
-          <div class="event"><div><b>25</b><small>THG 8</small></div><span><b>Nộp báo cáo tiến độ tuần</b><small>Trước 17:00 · Các phòng ban</small></span></div>
-        </div>
-      </section>
-    </div>
+    </main>
 
-    <footer>© 2026 Phòng Kỹ thuật · Petrolimex Aviation <span>Phiên bản 1.0.0</span></footer>
-  </main>
-</div>
-<script src="./assets/js/portal.js"></script>
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+    <footer class="portal-footer">
+      <span class="footer-icon">◇</span>
+      <span>
+        PHÒNG KỸ THUẬT – PETROLIMEX AVIATION
+      </span>
+    </footer>
+
+  </div>
+
 </body>
 </html>

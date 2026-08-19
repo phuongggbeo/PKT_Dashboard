@@ -1,0 +1,1 @@
+const el=document.getElementById('dateText');if(el){el.textContent='Hôm nay là '+new Intl.DateTimeFormat('vi-VN',{weekday:'long',day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date());}

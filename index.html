@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PKT Portal - Phòng Kỹ thuật</title>
+<link rel="stylesheet" href="./assets/css/portal.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div>
+      <div class="brand"><div class="logo">PA</div><div><b>PETROLIMEX AVIATION</b><span>PHÒNG KỸ THUẬT</span></div></div>
+      <nav>
+        <a class="active" href="./">⌂ <span>Tổng quan</span></a>
+        <a href="./tien-do/">☷ <span>Quản lý tiến độ</span></a>
+        <a href="./hao-hut/">▥ <span>Quản lý số lượng</span></a>
+        <a href="./ptd/">▣ <span>Quản lý PTĐ</span></a>
+      </nav>
+      <hr>
+      <nav>
+        <a href="#alerts">♢ <span>Thông báo</span><em>3</em></a>
+        <a href="#calendar">□ <span>Lịch công việc</span></a>
+        <a href="#reports">▤ <span>Báo cáo</span></a>
+        <a href="#docs">▱ <span>Tài liệu</span></a>
+      </nav>
+    </div>
+    <div class="collapse">‹ Thu gọn</div>
+  </aside>
+
+  <main>
+    <header>
+      <div><small>CỔNG ỨNG DỤNG NỘI BỘ</small><h1>PHÒNG KỸ THUẬT</h1></div>
+      <div class="user">🔔 <span>Nguyễn Thủy Phương<br><small>Chuyên viên</small></span></div>
+    </header>
+
+    <div class="content">
+      <section class="welcome">
+        <div><h2>Chào mừng trở lại!</h2><p id="dateText">Tổng quan hoạt động Phòng Kỹ thuật</p></div>
+        <button onclick="location.reload()">↻ Làm mới</button>
+      </section>
+
+      <section class="kpis">
+        <div class="kpi"><i class="blue">☑</i><div><b>124</b><span>Công việc đang theo dõi</span><small class="good">↑ 12 so với tuần trước</small></div></div>
+        <div class="kpi"><i class="red">◷</i><div><b class="danger">32</b><span>Công việc quá hạn</span><small class="good">↓ 5 so với tuần trước</small></div></div>
+        <div class="kpi"><i class="amber">□</i><div><b class="warning">18</b><span>Công việc sắp đến hạn</span><small>Trong 7 ngày tới</small></div></div>
+        <div class="kpi"><i class="green">✓</i><div><b class="success">74%</b><span>Tiến độ hoàn thành chung</span><small class="good">↑ 6% so với tháng trước</small></div></div>
+        <div class="kpi"><i class="blue">▥</i><div><b>0.108%</b><span>Hao hụt toàn công ty</span><small>Định mức ≤ 0.22%</small></div></div>
+      </section>
+
+      <section class="modules">
+        <a class="module blue-card" href="./tien-do/">
+          <div class="module-top"><div><small>QUẢN LÝ</small><h3>TIẾN ĐỘ CÔNG VIỆC</h3><p>Theo dõi tiến độ công việc, kế hoạch hàng tuần, phân công và báo cáo.</p></div><div class="art">🎯</div></div>
+          <div class="stats"><div><b>32</b><span>Quá hạn</span></div><div><b>18</b><span>Sắp đến hạn</span></div><div><b>74%</b><span>Hoàn thành</span></div></div>
+          <div class="cta">Truy cập hệ thống <span>→</span></div>
+        </a>
+
+        <a class="module green-card" href="./hao-hut/">
+          <div class="module-top"><div><small>QUẢN LÝ</small><h3>SỐ LƯỢNG & HAO HỤT</h3><p>Theo dõi nhập, xuất, tồn kho và hao hụt hàng ngày tại các chi nhánh.</p></div><div class="art">📊</div></div>
+          <div class="stats"><div><b>0.108%</b><span>Hao hụt hôm nay</span></div><div><b>7/8</b><span>Chi nhánh báo cáo</span></div><div><b>0.22%</b><span>Định mức</span></div></div>
+          <div class="cta">Truy cập hệ thống <span>→</span></div>
+        </a>
+
+        <a class="module orange-card" href="./ptd/">
+          <div class="module-top"><div><small>QUẢN LÝ</small><h3>PHƯƠNG TIỆN ĐO</h3><p>Quản lý phương tiện đo, lịch kiểm định/hiệu chuẩn và cảnh báo quá hạn.</p></div><div class="art">⏱️</div></div>
+          <div class="stats"><div><b>85</b><span>Sắp đến hạn</span></div><div><b>32</b><span>Quá hạn</span></div><div><b>1,154</b><span>Tổng PTĐ</span></div></div>
+          <div class="cta">Truy cập hệ thống <span>→</span></div>
+        </a>
+      </section>
+
+      <section class="bottom">
+        <div class="panel" id="alerts">
+          <div class="panel-head"><b>CÔNG VIỆC QUÁ HẠN (MỚI NHẤT)</b><a href="./tien-do/">Xem tất cả</a></div>
+          <div class="row"><i></i><span>Kiểm tra, bảo trì hệ thống thiết bị điện tại Cảng HK Nội Bài</span><b>10 ngày</b><small>P. Kỹ thuật điện</small></div>
+          <div class="row"><i></i><span>Triển khai kế hoạch kiểm tra, bảo dưỡng xe tra nạp nhiên liệu</span><b>7 ngày</b><small>P. Xe & CN kho bể</small></div>
+          <div class="row"><i></i><span>Hoàn thiện hồ sơ kiểm định PTĐ quý II/2026</span><b>5 ngày</b><small>P. Đo lường</small></div>
+          <div class="row"><i></i><span>Rà soát hao hụt bất thường tại Chi nhánh Cam Ranh</span><b>3 ngày</b><small>P. Số lượng</small></div>
+        </div>
+
+        <div class="panel" id="calendar">
+          <div class="panel-head"><b>LỊCH CÔNG VIỆC SẮP TỚI</b><a href="#">Xem lịch đầy đủ</a></div>
+          <div class="event"><div><b>19</b><small>THG 8</small></div><span><b>Họp giao ban Phòng Kỹ thuật</b><small>08:30 - 10:00 · Phòng họp PKT</small></span></div>
+          <div class="event"><div><b>21</b><small>THG 8</small></div><span><b>Kiểm tra định kỳ hệ thống hydrant tại SGN</b><small>09:00 - 12:00 · Chi nhánh Tân Sơn Nhất</small></span></div>
+          <div class="event"><div><b>23</b><small>THG 8</small></div><span><b>Rà soát số liệu hao hụt tuần</b><small>14:00 - 16:00 · P. Số lượng</small></span></div>
+          <div class="event"><div><b>25</b><small>THG 8</small></div><span><b>Nộp báo cáo tiến độ tuần</b><small>Trước 17:00 · Các phòng ban</small></span></div>
+        </div>
+      </section>
+    </div>
+
+    <footer>© 2026 Phòng Kỹ thuật · Petrolimex Aviation <span>Phiên bản 1.0.0</span></footer>
+  </main>
+</div>
+<script src="./assets/js/portal.js"></script>
+</body>
+</html>

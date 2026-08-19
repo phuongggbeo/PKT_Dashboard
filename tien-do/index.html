@@ -301,6 +301,42 @@ table.xls .mang-row td{background:#eef3f8;font-weight:700;color:var(--navy);font
   .kanban{grid-template-columns:repeat(2,1fr)}
   .rep-grid{grid-template-columns:1fr}
 }
+
+  /* ===== NÚT QUAY VỀ PORTAL PKT ===== */
+.portal-home-btn {
+    position: fixed;
+    top: 18px;
+    right: 20px;
+    z-index: 99999;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    height: 40px;
+    padding: 0 15px;
+
+    background: #0b2d60;
+    color: #ffffff;
+
+    border-radius: 9px;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    box-shadow: 0 4px 14px rgba(11,45,96,0.20);
+
+    transition: all 0.2s ease;
+}
+
+.portal-home-btn:hover {
+    background: #1769d2;
+    transform: translateY(-1px);
+}
+  
 /* Chế độ Xem: ẩn mọi nút chỉnh sửa */
 body.view-only .admin-only{display:none !important}
 body.view-only #drawer .drawer-foot .btn-primary,
@@ -312,6 +348,10 @@ body.view-only .view-banner{display:flex;align-items:center;gap:8px;background:#
 </style>
 </head>
 <body>
+  <a href="../" class="portal-home-btn">
+    🏠 Portal PKT
+</a>
+      <!-- Nội dung phần mềm hiện tại -->
 <div class="app">
   <!-- SIDEBAR -->
   <aside class="sidebar">

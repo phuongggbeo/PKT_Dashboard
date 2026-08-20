@@ -60,8 +60,8 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
    Supabase -> Connect -> App Framework / API keys
    Publishable key (hoac anon legacy), KHONG dung service_role.
 ======================================================== */
-const SUPABASE_URL = 'PASTE_SUPABASE_URL_HERE';
-const SUPABASE_PUBLISHABLE_KEY = 'PASTE_SUPABASE_PUBLISHABLE_KEY_HERE';
+const SUPABASE_URL = 'https://yiyreegrphebgdqwmwmh.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_YqLG_CVTRwEZ9eYiGJ4egw_UAVGnLYB';
 const CONFIGURED = !SUPABASE_URL.includes('PASTE_') && !SUPABASE_PUBLISHABLE_KEY.includes('PASTE_');
 const supabase = CONFIGURED ? createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY) : null;
 window.supabaseClient=supabase;

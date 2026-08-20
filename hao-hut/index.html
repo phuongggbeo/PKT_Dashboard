@@ -60,8 +60,8 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
    Supabase -> Connect -> App Framework / API keys
    Publishable key (hoac anon legacy), KHONG dung service_role.
 ======================================================== */
-const SUPABASE_URL = 'https://yiyreegrphebgdqwmwmh.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_YqLG_CVTRwEZ9eYiGJ4egw_UAVGnLYB';
+const SUPABASE_URL = 'PASTE_SUPABASE_URL_HERE';
+const SUPABASE_PUBLISHABLE_KEY = 'PASTE_SUPABASE_PUBLISHABLE_KEY_HERE';
 const CONFIGURED = !SUPABASE_URL.includes('PASTE_') && !SUPABASE_PUBLISHABLE_KEY.includes('PASTE_');
 const supabase = CONFIGURED ? createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY) : null;
 window.supabaseClient=supabase;
@@ -131,25 +131,239 @@ window.loadOfficialMonth=async function(){const [y,m]=officialMonth.value.split(
    - Sheet Tong hop theo ngay: A:Y
    - Sheet CN HAN/HPH/...: A:Y, header row 1.
 ======================================================== */
-window.previewDailyExcel=async function(){const file=dailyFile.files[0];if(!file)return alert('Chọn file');const wb=await readWorkbook(file);parsedDaily=parseDailyWorkbook(wb);dailyPreview.innerHTML=`<div style="padding:10px;text-align:left"><b>Nhận diện:</b> ${parsedDaily.details.length} dòng chi tiết; ${parsedDaily.summaries.length} dòng tổng hợp; CN: ${[...new Set(parsedDaily.details.map(x=>x.branch))].join(', ')}</div>`}
-function parseDailyWorkbook(wb){
- const details=[],summaries=[];
- for(const code of ['HAN','HPH','DAD','CXR','DLI','SGN','PQC','DBP']){
-   if(!wb.Sheets[code])continue;const rows=sheetRows(wb,code);
-   for(let i=1;i<rows.length;i++){const r=rows[i];if(!r||!r[1]||!r[2])continue;const date=excelDate(r[1]);if(!date)continue;
-     details.push({branch:code,date,row:i+1,thoi_gian_do_text:r[0]??null,ma_phuong_tien_chua:r[2]??null,muc_dich_do:r[3]??null,
-      chieu_cao_dau_mm:n(r[4]),chieu_cao_tu_dong_mm:n(r[5]),chenh_lech_do_mm:n(r[6]),nhiet_do_c:n(r[7]),d15:n(r[8]),vtt_lit:n(r[9]),v15_lit:n(r[10]),
-      luong_giam_dinh_hang_nhap_l15:n(r[11]),luong_nhan_tai_be_l15:n(r[12]),luong_xuat_cong_to_l15:n(r[13]),luong_xuat_ban_may_bay_l15:n(r[14]),
-      xuat_ban_khac_l15:n(r[15]),xuat_lai_len_be_l15:n(r[16]),xuat_tai_be_l15:n(r[17]),luong_giam_dinh_hang_nhap_be_l15:n(r[18]),
-      ton_dau_xe_tra_nap_l15:n(r[19]),ton_cuoi_xe_tra_nap_l15:n(r[20]),ton_dau_ngay_l15:n(r[21]),ton_cuoi_ngay_l15:n(r[22]),luong_chuyen_l15:n(r[23]),luong_nhan_l15:n(r[24]),du_lieu_goc:r});
+window.previewDailyExcel=async function(){
+ const file=dailyFile.files[0];
+ if(!file)return alert('Chọn file');
+ const wb=await readWorkbook(file);
+ parsedDaily=parseDailyWorkbook(wb,file.name);
+ dailyPreview.innerHTML=`<div style="padding:10px;text-align:left;line-height:1.7">
+   <b>Kiểu file:</b> ${parsedDaily.modeLabel}<br>
+   <b>Chi nhánh:</b> ${parsedDaily.branch||[...new Set(parsedDaily.details.map(x=>x.branch))].join(', ')}<br>
+   <b>Sheet nhận diện:</b> ${parsedDaily.sheetCount}<br>
+   <b>Dòng chi tiết:</b> ${parsedDaily.details.length}<br>
+   <b>Dòng tổng hợp ngày:</b> ${parsedDaily.summaries.length}
+   ${parsedDaily.warnings.length?`<br><span style="color:#b65c02"><b>Cảnh báo:</b> ${parsedDaily.warnings.join(' | ')}</span>`:''}
+ </div>`;
+}
+
+function vnNorm(s){
+ return String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+   .toLowerCase().replace(/đ/g,'d').replace(/[^a-z0-9]+/g,' ').trim();
+}
+function findBranchCode(fileName,wb){
+ const hay=vnNorm(fileName+' '+wb.SheetNames.join(' '));
+ const tests=[
+  ['HAN',['han','noi bai']],['HPH',['hph','cat bi']],['DAD',['dad','da nang']],
+  ['CXR',['cxr','cam ranh']],['DLI',['dli','lien khuong','da lat']],
+  ['SGN',['sgn','tan son nhat','hcm','ho chi minh']],['PQC',['pqc','phu quoc']],['DBP',['dbp','dien bien']]
+ ];
+ for(const [code,keys] of tests)if(keys.some(k=>new RegExp(`(^| )${vnNorm(k)}( |$)`).test(hay)))return code;
+ // fallback: quét vùng đầu các sheet để tìm tên CN
+ for(const sn of wb.SheetNames.slice(0,5)){
+   const rr=sheetRows(wb,sn).slice(0,15);
+   const txt=vnNorm(rr.flat().filter(Boolean).join(' '));
+   for(const [code,keys] of tests)if(keys.some(k=>txt.includes(vnNorm(k))))return code;
+ }
+ return null;
+}
+function yearMonthFromFile(name){
+ const s=String(name);
+ let m=s.match(/(20\d{2})[^\d]?(0?[1-9]|1[0-2])/);
+ if(m)return {year:+m[1],month:+m[2]};
+ m=s.match(/(0?[1-9]|1[0-2])[^\d]?(20\d{2})/);
+ if(m)return {year:+m[2],month:+m[1]};
+ m=s.match(/20\d{2}/);
+ return {year:m?+m[0]:new Date().getFullYear(),month:null};
+}
+function dateFromSheetName(name,fileName){
+ const s=String(name).trim();
+ let m=s.match(/(?:^|\D)(\d{1,2})[\/_.-](\d{1,2})[\/_.-](20\d{2})(?:\D|$)/);
+ if(m)return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+ m=s.match(/^(20\d{2})[\/_.-](\d{1,2})[\/_.-](\d{1,2})$/);
+ if(m)return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+ m=s.match(/^(\d{2})(\d{2})(20\d{2})$/);
+ if(m)return `${m[3]}-${m[2]}-${m[1]}`;
+ const ym=yearMonthFromFile(fileName);
+ m=s.match(/^(?:ngay\s*)?(\d{1,2})$/i);
+ if(m&&ym.month)return `${ym.year}-${String(ym.month).padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+ m=s.match(/^(?:ngay\s*)?(\d{1,2})[\/_.-](\d{1,2})$/i);
+ if(m)return `${ym.year}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+ return null;
+}
+function findDateInsideRows(rows){
+ for(let i=0;i<Math.min(rows.length,20);i++){
+   for(let j=0;j<Math.min((rows[i]||[]).length,12);j++){
+     const d=excelDate(rows[i]?.[j]);if(d)return d;
    }
  }
- const sr=sheetRows(wb,'Tổng hợp theo ngày');
- for(let i=1;i<sr.length;i++){const r=sr[i];const code=branchAlias[String(r?.[0]??'').trim()];const date=excelDate(r?.[1]);if(!code||!date)continue;
-   summaries.push({branch:code,date,tong_chenh_lech_do_dn_l15:n(r[2]),luong_giam_dinh_hang_nhap_l15:n(r[3]),luong_nhan_tai_be_l15:n(r[4]),ty_le_hao_hut_nhap_pct:excelPct(r[5]),luong_xuat_cong_to_l15:n(r[6]),xuat_ban_khac_l15:n(r[7]),xuat_xtn_sau_testrig_l15:n(r[8]),xuat_tai_be_l15:n(r[9]),ty_le_hao_hut_be_cong_to_pct:excelPct(r[10]),ton_dau_xe_tra_nap_l15:n(r[11]),luong_xuat_cong_to_xe_l15:n(r[12]),xuat_khac_xe_l15:n(r[13]),luong_xuat_ban_may_bay_l15:n(r[14]),ton_cuoi_xe_tra_nap_l15:n(r[15]),ty_le_hao_hut_xuat_ban_pct:excelPct(r[16]),ton_dau_ngay_l15:n(r[17]),luong_giam_dinh_hang_nhap_be_l15:n(r[18]),luong_xuat_ban_may_bay_tong_hop_l15:n(r[19]),ton_cuoi_ngay_l15:n(r[20]),ty_le_hao_hut_tong_hop_pct:excelPct(r[21]),luong_hao_hut_tong_hop_l15:n(r[22]),luong_hh_dinh_muc_l15:n(r[23]),chenh_lech_dm_tt_l15:n(r[24])});
- }
- return {details,summaries};
+ return null;
 }
+function findHeaderRow(rows){
+ for(let i=0;i<Math.min(rows.length,30);i++){
+   const r=(rows[i]||[]).map(v=>vnNorm(v));
+   const txt=r.join(' | ');
+   const score=[
+     /phuong tien chua|pt chua|be chua/.test(txt),
+     /muc dich do/.test(txt),
+     /h dau|chieu cao dau/.test(txt),
+     /d15|v15|vtt/.test(txt)
+   ].filter(Boolean).length;
+   if(score>=2)return i;
+ }
+ return -1;
+}
+function headerMap(row){
+ const mp={};
+ (row||[]).forEach((v,i)=>{
+   const h=vnNorm(v);
+   if(/ngay gio do|thoi gian do/.test(h))mp.time=i;
+   else if(/^ngay$|ngay do/.test(h))mp.date=i;
+   else if(/phuong tien chua|pt chua|be chua|ma be/.test(h))mp.tank=i;
+   else if(/muc dich do/.test(h))mp.purpose=i;
+   else if(/h dau tu dong|chieu cao tu dong/.test(h))mp.auto=i;
+   else if(/chenh lech.*do|chenh.*mm/.test(h))mp.diff=i;
+   else if(/^h dau$|chieu cao dau/.test(h))mp.manual=i;
+   else if(/^t$|nhiet do/.test(h))mp.temp=i;
+   else if(/d15|khoi luong rieng/.test(h))mp.d15=i;
+   else if(/vtt|the tich thuc/.test(h))mp.vtt=i;
+   else if(/^v15$|the tich.*15/.test(h))mp.v15=i;
+   else if(/giam dinh.*nhap/.test(h)&&!/be/.test(h))mp.inspection=i;
+   else if(/nhan.*be/.test(h))mp.receipt=i;
+   else if(/xuat.*cong to/.test(h)&&!/xe/.test(h))mp.meter=i;
+   else if(/xuat.*ban.*may bay|xuat.*may bay/.test(h))mp.aircraft=i;
+   else if(/xuat.*khac/.test(h)&&!/xe/.test(h))mp.other=i;
+   else if(/xuat.*lai.*be|xuat.*testrig/.test(h))mp.backToTank=i;
+   else if(/xuat.*tai be/.test(h))mp.tankOut=i;
+   else if(/ton dau.*xe/.test(h))mp.refOpen=i;
+   else if(/ton cuoi.*xe/.test(h))mp.refClose=i;
+   else if(/ton dau ngay/.test(h))mp.opening=i;
+   else if(/ton cuoi ngay/.test(h))mp.closing=i;
+   else if(/luong chuyen|chuyen be/.test(h))mp.transfer=i;
+   else if(/luong nhan/.test(h)&&mp.receipt!==i)mp.received=i;
+ });
+ return mp;
+}
+function valueAt(r,idx){return idx===undefined?null:r?.[idx]}
+function buildDetail(r,mp,branch,date,rowNo){
+ return {
+   branch,date,row:rowNo,
+   thoi_gian_do_text:valueAt(r,mp.time)??null,
+   ma_phuong_tien_chua:valueAt(r,mp.tank)??null,
+   muc_dich_do:valueAt(r,mp.purpose)??null,
+   chieu_cao_dau_mm:n(valueAt(r,mp.manual)),
+   chieu_cao_tu_dong_mm:n(valueAt(r,mp.auto)),
+   chenh_lech_do_mm:n(valueAt(r,mp.diff)),
+   nhiet_do_c:n(valueAt(r,mp.temp)),d15:n(valueAt(r,mp.d15)),
+   vtt_lit:n(valueAt(r,mp.vtt)),v15_lit:n(valueAt(r,mp.v15)),
+   luong_giam_dinh_hang_nhap_l15:n(valueAt(r,mp.inspection)),
+   luong_nhan_tai_be_l15:n(valueAt(r,mp.receipt)),
+   luong_xuat_cong_to_l15:n(valueAt(r,mp.meter)),
+   luong_xuat_ban_may_bay_l15:n(valueAt(r,mp.aircraft)),
+   xuat_ban_khac_l15:n(valueAt(r,mp.other)),
+   xuat_lai_len_be_l15:n(valueAt(r,mp.backToTank)),
+   xuat_tai_be_l15:n(valueAt(r,mp.tankOut)),
+   ton_dau_xe_tra_nap_l15:n(valueAt(r,mp.refOpen)),
+   ton_cuoi_xe_tra_nap_l15:n(valueAt(r,mp.refClose)),
+   ton_dau_ngay_l15:n(valueAt(r,mp.opening)),
+   ton_cuoi_ngay_l15:n(valueAt(r,mp.closing)),
+   luong_chuyen_l15:n(valueAt(r,mp.transfer)),
+   luong_nhan_l15:n(valueAt(r,mp.received)),
+   du_lieu_goc:r
+ };
+}
+function sum(rows,key){return rows.reduce((a,x)=>a+(Number(x[key])||0),0)}
+function computeDailySummary(branch,date,arr){
+ const gd=sum(arr,'luong_giam_dinh_hang_nhap_l15');
+ const nb=sum(arr,'luong_nhan_tai_be_l15');
+ const ct=sum(arr,'luong_xuat_cong_to_l15');
+ const xb=sum(arr,'xuat_tai_be_l15');
+ const aircraft=sum(arr,'luong_xuat_ban_may_bay_l15');
+ const refOpen=sum(arr,'ton_dau_xe_tra_nap_l15');
+ const refClose=sum(arr,'ton_cuoi_xe_tra_nap_l15');
+ const opening=sum(arr,'ton_dau_ngay_l15');
+ const closing=sum(arr,'ton_cuoi_ngay_l15');
+ const hhNhap=gd-nb;
+ const hhBeCT=xb-ct;
+ const hhXuat=refOpen+ct-aircraft-refClose;
+ const hhTong=opening+gd-aircraft-closing;
+ return {
+   branch,date,
+   tong_chenh_lech_do_dn_l15:sum(arr,'chenh_lech_do_mm'),
+   luong_giam_dinh_hang_nhap_l15:gd,
+   luong_nhan_tai_be_l15:nb,
+   ty_le_hao_hut_nhap_pct:gd?hhNhap/gd*100:null,
+   luong_xuat_cong_to_l15:ct,
+   xuat_tai_be_l15:xb,
+   ty_le_hao_hut_be_cong_to_pct:ct?hhBeCT/ct*100:null,
+   ton_dau_xe_tra_nap_l15:refOpen,
+   luong_xuat_cong_to_xe_l15:ct,
+   luong_xuat_ban_may_bay_l15:aircraft,
+   ton_cuoi_xe_tra_nap_l15:refClose,
+   ty_le_hao_hut_xuat_ban_pct:aircraft?hhXuat/aircraft*100:null,
+   ton_dau_ngay_l15:opening,
+   luong_giam_dinh_hang_nhap_be_l15:gd,
+   luong_xuat_ban_may_bay_tong_hop_l15:aircraft,
+   ton_cuoi_ngay_l15:closing,
+   ty_le_hao_hut_tong_hop_pct:gd?hhTong/gd*100:null,
+   luong_hao_hut_tong_hop_l15:hhTong
+ };
+}
+function parseDailyWorkbook(wb,fileName=''){
+ const details=[],summaries=[],warnings=[];
+ const branchSheets=['HAN','HPH','DAD','CXR','DLI','SGN','PQC','DBP'].filter(x=>wb.Sheets[x]);
+ const oldMode=branchSheets.length>0 || !!wb.Sheets['Tổng hợp theo ngày'];
+
+ // MODE A: file tổng hợp cũ - mỗi CN là 1 sheet
+ if(oldMode){
+   for(const code of branchSheets){
+     const rows=sheetRows(wb,code);
+     for(let i=1;i<rows.length;i++){
+       const r=rows[i];if(!r||!r[1]||!r[2])continue;
+       const date=excelDate(r[1]);if(!date)continue;
+       details.push({branch:code,date,row:i+1,thoi_gian_do_text:r[0]??null,ma_phuong_tien_chua:r[2]??null,muc_dich_do:r[3]??null,
+        chieu_cao_dau_mm:n(r[4]),chieu_cao_tu_dong_mm:n(r[5]),chenh_lech_do_mm:n(r[6]),nhiet_do_c:n(r[7]),d15:n(r[8]),vtt_lit:n(r[9]),v15_lit:n(r[10]),
+        luong_giam_dinh_hang_nhap_l15:n(r[11]),luong_nhan_tai_be_l15:n(r[12]),luong_xuat_cong_to_l15:n(r[13]),luong_xuat_ban_may_bay_l15:n(r[14]),
+        xuat_ban_khac_l15:n(r[15]),xuat_lai_len_be_l15:n(r[16]),xuat_tai_be_l15:n(r[17]),luong_giam_dinh_hang_nhap_be_l15:n(r[18]),
+        ton_dau_xe_tra_nap_l15:n(r[19]),ton_cuoi_xe_tra_nap_l15:n(r[20]),ton_dau_ngay_l15:n(r[21]),ton_cuoi_ngay_l15:n(r[22]),luong_chuyen_l15:n(r[23]),luong_nhan_l15:n(r[24]),du_lieu_goc:r});
+     }
+   }
+   const sr=sheetRows(wb,'Tổng hợp theo ngày');
+   for(let i=1;i<sr.length;i++){
+     const r=sr[i],code=branchAlias[String(r?.[0]??'').trim()],date=excelDate(r?.[1]);
+     if(!code||!date)continue;
+     summaries.push({branch:code,date,tong_chenh_lech_do_dn_l15:n(r[2]),luong_giam_dinh_hang_nhap_l15:n(r[3]),luong_nhan_tai_be_l15:n(r[4]),ty_le_hao_hut_nhap_pct:excelPct(r[5]),luong_xuat_cong_to_l15:n(r[6]),xuat_ban_khac_l15:n(r[7]),xuat_xtn_sau_testrig_l15:n(r[8]),xuat_tai_be_l15:n(r[9]),ty_le_hao_hut_be_cong_to_pct:excelPct(r[10]),ton_dau_xe_tra_nap_l15:n(r[11]),luong_xuat_cong_to_xe_l15:n(r[12]),xuat_khac_xe_l15:n(r[13]),luong_xuat_ban_may_bay_l15:n(r[14]),ton_cuoi_xe_tra_nap_l15:n(r[15]),ty_le_hao_hut_xuat_ban_pct:excelPct(r[16]),ton_dau_ngay_l15:n(r[17]),luong_giam_dinh_hang_nhap_be_l15:n(r[18]),luong_xuat_ban_may_bay_tong_hop_l15:n(r[19]),ton_cuoi_ngay_l15:n(r[20]),ty_le_hao_hut_tong_hop_pct:excelPct(r[21]),luong_hao_hut_tong_hop_l15:n(r[22]),luong_hh_dinh_muc_l15:n(r[23]),chenh_lech_dm_tt_l15:n(r[24])});
+   }
+   return {details,summaries,mode:'consolidated',modeLabel:'File tổng hợp nhiều chi nhánh',branch:null,sheetCount:branchSheets.length,warnings};
+ }
+
+ // MODE B: file 1 chi nhánh, mỗi ngày = 1 sheet
+ const branch=findBranchCode(fileName,wb);
+ if(!branch)warnings.push('Không nhận diện được chi nhánh từ tên file/nội dung. Hãy đặt mã CN (HAN/HPH/DAD/...) trong tên file.');
+ for(const sn of wb.SheetNames){
+   if(/tong hop|summary|mau|template|huong dan/i.test(vnNorm(sn)))continue;
+   const rows=sheetRows(wb,sn);
+   if(!rows.length)continue;
+   const date=dateFromSheetName(sn,fileName)||findDateInsideRows(rows);
+   if(!date){warnings.push(`Bỏ qua sheet "${sn}": không nhận diện được ngày`);continue}
+   const hi=findHeaderRow(rows);
+   if(hi<0){warnings.push(`Bỏ qua sheet "${sn}": không tìm thấy dòng tiêu đề`);continue}
+   const mp=headerMap(rows[hi]);
+   if(mp.tank===undefined){warnings.push(`Bỏ qua sheet "${sn}": thiếu cột Phương tiện chứa/Bể`);continue}
+   const dayRows=[];
+   for(let i=hi+1;i<rows.length;i++){
+     const r=rows[i]||[];
+     const tank=valueAt(r,mp.tank);
+     if(tank===null||tank===undefined||String(tank).trim()==='')continue;
+     const normTank=vnNorm(tank);
+     if(/tong|cong|subtotal|total/.test(normTank))continue;
+     const d=buildDetail(r,mp,branch,date,i+1);
+     details.push(d);dayRows.push(d);
+   }
+   if(dayRows.length&&branch)summaries.push(computeDailySummary(branch,date,dayRows));
+ }
+ return {details,summaries,mode:'branch_daily_sheets',modeLabel:'File chi nhánh - mỗi ngày 1 sheet',branch,sheetCount:wb.SheetNames.length,warnings};
+}
+
 window.importDailyExcel=async function(){
  if(!CONFIGURED)return alert('Chưa cấu hình Supabase');if(!parsedDaily)await previewDailyExcel();if(!parsedDaily)return;
  const file=dailyFile.files[0],user=(await supabase.auth.getUser()).data.user;if(!user)return alert('Cần đăng nhập');

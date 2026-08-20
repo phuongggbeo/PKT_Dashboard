@@ -1,1 +1,402 @@
-<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Quản lý số lượng & hao hụt</title><style>body{margin:0;font-family:Arial,sans-serif;background:#f3f6fb;color:#153052}.wrap{max-width:900px;margin:70px auto;padding:30px}.card{background:#fff;border:1px solid #dfe6ef;border-radius:16px;padding:36px;box-shadow:0 8px 25px rgba(20,40,80,.08)}a{display:inline-block;margin-top:24px;background:#0d469d;color:#fff;text-decoration:none;padding:12px 18px;border-radius:9px}code{background:#edf2f7;padding:3px 6px;border-radius:5px}</style></head><body><div class="wrap"><div class="card"><h1>Quản lý số lượng & hao hụt</h1><p>Đây là file giữ chỗ để project GitHub chạy ngay.</p><p>Hãy thay file <code>hao-hut/index.html</code> bằng trang HTML riêng mà bạn đã xây cho mảng này.</p><a href="../">← Quay về Cổng PKT</a></div></div></body></html>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý số lượng & hao hụt - Petrolimex Aviation</title>
+  <style>
+    :root{
+      --navy:#082b68;--blue:#1267d6;--orange:#f58220;--bg:#f4f7fb;--card:#fff;
+      --text:#102a55;--muted:#718096;--border:#dfe6ef;--red:#e53935;--green:#16a064;--amber:#e99b00;
+      --shadow:0 6px 22px rgba(20,45,90,.07)
+    }
+    *{box-sizing:border-box}body{margin:0;font-family:"Segoe UI",Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+    button,input,select{font:inherit}.app{min-height:100vh}.sidebar{position:fixed;inset:0 auto 0 0;width:225px;background:linear-gradient(180deg,#092e64,#082653);color:#fff;padding:18px 12px;display:flex;flex-direction:column;justify-content:space-between}
+    .brand{padding:4px 8px 20px}.brand img{width:190px;max-height:58px;object-fit:contain;object-position:left center;background:#fff;border-radius:7px;padding:5px}.brand small{display:block;margin-top:8px;color:#c7d6ed;font-size:11px}
+    .nav{display:flex;flex-direction:column;gap:6px}.nav button,.nav a{border:0;background:transparent;color:#edf4ff;text-decoration:none;text-align:left;padding:11px 12px;border-radius:8px;cursor:pointer;font-size:13px}.nav button:hover,.nav a:hover{background:rgba(255,255,255,.08)}.nav .active{background:linear-gradient(90deg,#1764d1,#2475e6)}
+    .nav-label{font-size:10px;color:#87a5cc;margin:18px 12px 6px;font-weight:700;letter-spacing:.08em}.side-foot{padding:12px 8px;color:#c9d8ee;font-size:11px;line-height:1.5}
+    main{margin-left:225px}.topbar{height:78px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 26px;position:sticky;top:0;z-index:10}.title h1{font-size:20px;margin:0}.title p{font-size:11px;color:var(--muted);margin:5px 0 0}.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--border);background:#fff;border-radius:8px;padding:9px 12px;color:var(--text);cursor:pointer;font-weight:600;font-size:12px}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.dark{background:var(--navy);border-color:var(--navy);color:#fff}
+    .content{padding:22px 26px 34px;max-width:1720px;margin:auto}.view{display:none}.view.active{display:block}.toolbar{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:16px}.toolbar h2{margin:0;font-size:19px}.filters{display:flex;gap:8px;flex-wrap:wrap}.field{background:#fff;border:1px solid var(--border);border-radius:8px;padding:9px 11px;min-width:145px;color:var(--text)}
+    .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:18px}.kpi{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;box-shadow:var(--shadow)}.kpi span{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase}.kpi b{display:block;font-size:23px;margin-top:8px}.kpi small{display:block;font-size:10px;color:var(--muted);margin-top:5px}.red{color:var(--red)}.green{color:var(--green)}.amber{color:var(--amber)}.blue{color:var(--blue)}
+    .grid-2{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}.panel{background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}.panel-head{height:48px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 15px}.panel-head h3{font-size:13px;margin:0}.panel-body{padding:14px}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:12px}th{background:#f8fafc;color:#52647e;text-align:left;font-size:10px;padding:10px;border-bottom:1px solid var(--border);white-space:nowrap}td{padding:11px 10px;border-bottom:1px solid #edf1f5;white-space:nowrap}.badge{display:inline-block;border-radius:99px;padding:4px 8px;font-size:10px;font-weight:700}.badge.ok{background:#e7f7ef;color:#148750}.badge.warn{background:#fff3d9;color:#b87700}.badge.danger{background:#ffe8e7;color:#d62d2a}.badge.info{background:#e9f2ff;color:#1764c9}
+    .status-list{display:flex;flex-direction:column;gap:8px}.status-row{display:grid;grid-template-columns:45px 1fr 70px 80px;gap:8px;align-items:center;padding:11px;border:1px solid #e8edf4;border-radius:9px}.status-row strong{font-size:12px}.status-row span{font-size:11px;color:var(--muted)}.status-row b{text-align:right;font-size:12px}
+    .upload-zone{border:1.5px dashed #bdcbe0;border-radius:12px;background:#fbfdff;padding:28px;text-align:center}.upload-zone h3{margin:0 0 8px}.upload-zone p{color:var(--muted);font-size:12px}.upload-zone input{margin:12px 0}.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .login{position:fixed;inset:0;background:rgba(4,23,50,.68);z-index:100;display:none;place-items:center}.login.show{display:grid}.login-card{width:min(410px,calc(100% - 30px));background:#fff;border-radius:16px;padding:26px;box-shadow:0 25px 70px rgba(0,0,0,.25)}.login-card h2{margin:0 0 5px}.login-card p{font-size:12px;color:var(--muted);margin-bottom:18px}.login-card input{display:block;width:100%;margin:8px 0;border:1px solid var(--border);border-radius:8px;padding:11px}.notice{padding:10px 12px;background:#edf5ff;color:#31547a;border:1px solid #d3e5fb;border-radius:8px;font-size:11px;margin-bottom:14px}
+    .compare{display:grid;grid-template-columns:1fr 1fr;gap:14px}.compare-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px}.compare-card h3{font-size:13px;margin:0 0 12px}.metric{display:grid;grid-template-columns:1.2fr .7fr .7fr .7fr;gap:8px;padding:9px 0;border-bottom:1px solid #edf1f5;font-size:11px}.metric:first-of-type{font-weight:700;color:#60718a}
+    @media(max-width:1200px){.kpis{grid-template-columns:repeat(3,1fr)}.grid-2,.upload-grid,.compare{grid-template-columns:1fr}}
+    @media(max-width:760px){.sidebar{width:72px}.brand img{width:48px;height:48px;object-fit:cover}.brand small,.nav-label,.nav button span,.nav a span,.side-foot{display:none}main{margin-left:72px}.topbar{padding:0 14px}.content{padding:16px 12px}.kpis{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <img src="./assets/img/petrolimex-aviation-logo.png" alt="Petrolimex Aviation">
+        <small>QUẢN LÝ SỐ LƯỢNG & HAO HỤT</small>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-btn active" data-view="tong-quan">▦ <span>Tổng quan</span></button>
+
+        <div class="nav-label">DỮ LIỆU HÀNG NGÀY</div>
+        <button class="nav-btn" data-view="hang-ngay">▤ <span>Báo cáo ngày</span></button>
+        <button class="nav-btn" data-view="canh-bao">⚠ <span>Cảnh báo</span></button>
+
+        <div class="nav-label">BÁO CÁO CHÍNH THỨC</div>
+        <button class="nav-btn" data-view="bao-cao-thang">▣ <span>Báo cáo tháng</span></button>
+        <button class="nav-btn" data-view="doi-chieu">⇄ <span>Đối chiếu ngày ↔ tháng</span></button>
+
+        <div class="nav-label">DỮ LIỆU</div>
+        <button class="nav-btn" data-view="nhap-du-lieu">⇧ <span>Nhập dữ liệu</span></button>
+        <a href="../">⌂ <span>Portal PKT</span></a>
+      </nav>
+    </div>
+    <div class="side-foot">PHÒNG KỸ THUẬT<br>Petrolimex Aviation</div>
+  </aside>
+
+  <main>
+    <header class="topbar">
+      <div class="title"><h1>Quản lý số lượng & hao hụt</h1><p>Hai nguồn độc lập: dữ liệu vận hành hàng ngày và báo cáo tháng chính thức</p></div>
+      <div class="actions">
+        <button class="btn" id="connectionBtn">Chưa kết nối Supabase</button>
+        <button class="btn dark" id="loginBtn">Đăng nhập</button>
+      </div>
+    </header>
+
+    <div class="content">
+      <div id="configNotice" class="notice">
+        Hãy điền SUPABASE_URL và SUPABASE_ANON_KEY ở cuối file index.html. Khi chưa cấu hình, giao diện chạy ở chế độ minh họa.
+      </div>
+
+      <!-- TONG QUAN -->
+      <section id="tong-quan" class="view active">
+        <div class="toolbar">
+          <h2>Tổng quan</h2>
+          <div class="filters">
+            <input id="ngayTongQuan" class="field" type="date">
+            <select id="chiNhanhTongQuan" class="field"><option value="">Tất cả chi nhánh</option></select>
+          </div>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi"><span>Đã gửi báo cáo ngày</span><b class="blue" id="kpiDaGui">7/8</b><small>Theo ngày đang chọn</small></div>
+          <div class="kpi"><span>HHTH bình quân</span><b id="kpiHHTH">0.108%</b><small>Dữ liệu hàng ngày</small></div>
+          <div class="kpi"><span>Vượt định mức</span><b class="red" id="kpiVuotDM">1 CN</b><small>Định mức HHTH</small></div>
+          <div class="kpi"><span>Cảnh báo</span><b class="amber" id="kpiCanhBao">3</b><small>Chưa xử lý</small></div>
+          <div class="kpi"><span>BC tháng đã gửi</span><b class="green" id="kpiThangDaGui">6/8</b><small>Kỳ đang theo dõi</small></div>
+          <div class="kpi"><span>Cần đối chiếu</span><b class="amber" id="kpiDoiChieu">2 CN</b><small>Ngày ↔ tháng</small></div>
+        </div>
+
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-head"><h3>Theo dõi hao hụt theo chi nhánh</h3></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Chi nhánh</th><th>HH nhập</th><th>Bể → CT</th><th>Xuất bán</th><th>HHTH</th><th>Trạng thái</th></tr></thead>
+                <tbody id="dailyOverviewBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>Cảnh báo nổi bật</h3><button class="btn" onclick="showView('canh-bao')">Xem tất cả</button></div>
+            <div class="panel-body status-list" id="alertList"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- HANG NGAY -->
+      <section id="hang-ngay" class="view">
+        <div class="toolbar">
+          <h2>Dữ liệu hàng ngày</h2>
+          <div class="filters">
+            <input id="ngayHangNgay" class="field" type="date">
+            <select id="chiNhanhHangNgay" class="field"><option value="">Tất cả chi nhánh</option></select>
+            <button class="btn primary" onclick="showView('nhap-du-lieu')">+ Upload file ngày</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Báo cáo theo ngày</h3></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>CN</th><th>Ngày</th><th>Chênh đo ĐN (L15)</th><th>HH nhập</th><th>HH bể-CT</th><th>HH xuất bán</th><th>HHTH</th><th>Trạng thái</th></tr></thead>
+              <tbody id="dailyTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- BAO CAO THANG -->
+      <section id="bao-cao-thang" class="view">
+        <div class="toolbar">
+          <h2>Báo cáo chính thức tháng</h2>
+          <div class="filters">
+            <input id="thangBaoCao" class="field" type="month">
+            <select id="chiNhanhThang" class="field"><option value="">Tất cả chi nhánh</option></select>
+            <button class="btn primary" onclick="showView('nhap-du-lieu')">+ Upload báo cáo tháng</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Theo dõi báo cáo chi nhánh gửi</h3></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>CN</th><th>Kỳ</th><th>Trạng thái</th><th>Phiên bản</th><th>Ngày gửi</th><th>HH nhập</th><th>Bể-CT</th><th>Xuất bán</th><th>HHTH</th></tr></thead>
+              <tbody id="monthlyTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- DOI CHIEU -->
+      <section id="doi-chieu" class="view">
+        <div class="toolbar">
+          <h2>Đối chiếu dữ liệu ngày ↔ báo cáo chính thức</h2>
+          <div class="filters"><input class="field" type="month" value="2026-08"><select class="field"><option>HAN - Nội Bài</option></select></div>
+        </div>
+        <div class="compare">
+          <div class="compare-card">
+            <h3>HAN · Tháng 08/2026</h3>
+            <div class="metric"><span>Chỉ tiêu</span><span>Dữ liệu ngày</span><span>Chính thức</span><span>Chênh</span></div>
+            <div class="metric"><span>Hao hụt nhập</span><b>0.084%</b><b>0.086%</b><b class="amber">+0.002%</b></div>
+            <div class="metric"><span>Bể → công tơ</span><b>0.023%</b><b>0.023%</b><b>0.000%</b></div>
+            <div class="metric"><span>Xuất bán sân bay</span><b>0.062%</b><b>0.063%</b><b class="amber">+0.001%</b></div>
+            <div class="metric"><span>HHTH</span><b>0.108%</b><b>0.111%</b><b class="red">+0.003%</b></div>
+          </div>
+          <div class="compare-card">
+            <h3>Nguyên tắc đối chiếu</h3>
+            <p style="font-size:12px;line-height:1.7;color:#5d6d83">Dữ liệu ngày và báo cáo tháng được lưu độc lập. Hệ thống chỉ so sánh, không tự ghi đè số chính thức của chi nhánh. Mọi điều chỉnh báo cáo tháng nên được lưu thành phiên bản mới.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CANH BAO -->
+      <section id="canh-bao" class="view">
+        <div class="toolbar"><h2>Cảnh báo</h2><div class="filters"><select class="field"><option>Tất cả mức độ</option><option>Vượt định mức</option><option>Chênh đo</option><option>Thiếu báo cáo</option></select></div></div>
+        <div class="panel"><div class="panel-head"><h3>Các vấn đề cần xử lý</h3></div><div class="panel-body status-list" id="alertPageList"></div></div>
+      </section>
+
+      <!-- NHAP DU LIEU -->
+      <section id="nhap-du-lieu" class="view">
+        <div class="toolbar"><h2>Nhập dữ liệu</h2></div>
+        <div class="upload-grid">
+          <div class="upload-zone">
+            <h3>Dữ liệu hàng ngày</h3>
+            <p>Upload file Excel hàng ngày. File gốc được lưu tại Supabase Storage bucket <b>bao-cao-ngay</b>.</p>
+            <select id="uploadDailyBranch" class="field"><option value="">Chọn chi nhánh</option></select><br>
+            <input id="dailyFile" type="file" accept=".xlsx,.xls">
+            <br><button class="btn primary" id="uploadDailyBtn">Upload file ngày</button>
+          </div>
+          <div class="upload-zone">
+            <h3>Báo cáo chính thức tháng</h3>
+            <p>Mỗi lần chi nhánh gửi lại sẽ tạo một phiên bản mới, không xóa phiên bản cũ.</p>
+            <select id="uploadMonthlyBranch" class="field"><option value="">Chọn chi nhánh</option></select>
+            <input id="uploadMonthlyPeriod" class="field" type="month" value="2026-08"><br>
+            <input id="monthlyFile" type="file" accept=".xlsx,.xls">
+            <br><button class="btn primary" id="uploadMonthlyBtn">Upload báo cáo tháng</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div class="login" id="loginModal">
+  <div class="login-card">
+    <h2>Đăng nhập</h2>
+    <p>Tài khoản được tạo trong Supabase Authentication.</p>
+    <input id="emailInput" type="email" placeholder="Email">
+    <input id="passwordInput" type="password" placeholder="Mật khẩu">
+    <button class="btn primary" style="width:100%;margin-top:8px" id="doLoginBtn">Đăng nhập</button>
+    <button class="btn" style="width:100%;margin-top:8px" id="closeLoginBtn">Đóng</button>
+    <div id="loginMessage" style="font-size:11px;margin-top:10px;color:#d52f2f"></div>
+  </div>
+</div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+  // ============================================================
+  // DIEN 2 GIA TRI NAY SAU KHI TAO PROJECT SUPABASE
+  // Project Settings -> API
+  // DUNG ANON / PUBLISHABLE KEY, KHONG DUNG SERVICE_ROLE KEY.
+  // ============================================================
+  const SUPABASE_URL = 'https://yiyreegrphebgdqwmwmh.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_YqLG_CVTRwEZ9eYiGJ4egw_UAVGnLYB';
+
+  const CONFIGURED = !SUPABASE_URL.includes('PASTE_') && !SUPABASE_ANON_KEY.includes('PASTE_');
+  const supabase = CONFIGURED ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+  const demoBranches = [
+    {ma_chi_nhanh:'HAN',ten_chi_nhanh:'Nội Bài'},
+    {ma_chi_nhanh:'HPH',ten_chi_nhanh:'Cát Bi'},
+    {ma_chi_nhanh:'DAD',ten_chi_nhanh:'Đà Nẵng'},
+    {ma_chi_nhanh:'CXR',ten_chi_nhanh:'Cam Ranh'},
+    {ma_chi_nhanh:'DLI',ten_chi_nhanh:'Liên Khương'},
+    {ma_chi_nhanh:'SGN',ten_chi_nhanh:'Tân Sơn Nhất'},
+    {ma_chi_nhanh:'PQC',ten_chi_nhanh:'Phú Quốc'},
+    {ma_chi_nhanh:'DBP',ten_chi_nhanh:'Điện Biên'}
+  ];
+
+  const demoDaily = [
+    ['HAN','18/08/2026',0,'0.084%','0.023%','0.062%','0.108%','ok'],
+    ['HPH','18/08/2026',-3,'0.104%','0.047%','0.071%','0.151%','warn'],
+    ['DAD','18/08/2026',-8,'0.117%','0.054%','0.082%','0.231%','danger'],
+    ['CXR','18/08/2026',2,'0.098%','0.032%','0.064%','0.143%','ok'],
+    ['DLI','18/08/2026',1,'0.075%','0.021%','0.058%','0.101%','ok'],
+    ['SGN','18/08/2026',0,'0.106%','0.018%','0.049%','0.097%','ok'],
+    ['PQC','18/08/2026',-2,'0.109%','0.028%','0.079%','0.182%','warn']
+  ];
+
+  const demoMonthly = [
+    ['HAN','08/2026','Đã gửi','V2','03/09/2026','0.086%','0.023%','0.063%','0.111%'],
+    ['HPH','08/2026','Đã gửi','V1','02/09/2026','0.102%','0.045%','0.071%','0.149%'],
+    ['DAD','08/2026','Đã gửi','V1','03/09/2026','0.119%','0.052%','0.081%','0.228%'],
+    ['CXR','08/2026','Chưa gửi','—','—','—','—','—','—']
+  ];
+
+  window.showView = function(id){
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===id));
+  };
+
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click',()=>showView(btn.dataset.view)));
+
+  function badgeClass(status){
+    if(status==='danger'||status==='Quá hạn') return 'danger';
+    if(status==='warn'||status==='Sắp đến hạn') return 'warn';
+    if(status==='ok'||status==='Đã gửi') return 'ok';
+    return 'info';
+  }
+
+  function renderDemo(){
+    const body = document.getElementById('dailyTableBody');
+    body.innerHTML = demoDaily.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td><b>${r[6]}</b></td><td><span class="badge ${badgeClass(r[7])}">${r[7]==='danger'?'Vượt ĐM':r[7]==='warn'?'Cần chú ý':'Bình thường'}</span></td></tr>`).join('');
+    document.getElementById('dailyOverviewBody').innerHTML = demoDaily.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td><b>${r[6]}</b></td><td><span class="badge ${badgeClass(r[7])}">${r[7]==='danger'?'Vượt ĐM':r[7]==='warn'?'Cần chú ý':'Bình thường'}</span></td></tr>`).join('');
+    document.getElementById('monthlyTableBody').innerHTML = demoMonthly.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td><span class="badge ${badgeClass(r[2])}">${r[2]}</span></td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td>${r[6]}</td><td>${r[7]}</td><td><b>${r[8]}</b></td></tr>`).join('');
+
+    const alerts = [
+      ['DAD','HHTH 0.231% vượt định mức 0.220%','danger'],
+      ['CXR','Chênh lệch đo bể vượt ngưỡng kiểm soát','danger'],
+      ['PQC','Hao hụt xuất bán đang tiệm cận định mức','warn'],
+      ['DBP','Chưa có báo cáo ngày đang chọn','warn']
+    ];
+    const html = alerts.map(a=>`<div class="status-row"><strong>${a[0]}</strong><span>${a[1]}</span><b><span class="badge ${a[2]}">${a[2]==='danger'?'Cảnh báo':'Chú ý'}</span></b><span>Chưa xử lý</span></div>`).join('');
+    document.getElementById('alertList').innerHTML = html;
+    document.getElementById('alertPageList').innerHTML = html;
+  }
+
+  function populateBranches(branches){
+    const sels=['chiNhanhTongQuan','chiNhanhHangNgay','chiNhanhThang','uploadDailyBranch','uploadMonthlyBranch'];
+    sels.forEach(id=>{
+      const el=document.getElementById(id);
+      const first=el.options[0]?.outerHTML || '';
+      el.innerHTML=first+branches.map(b=>`<option value="${b.id||b.ma_chi_nhanh}">${b.ma_chi_nhanh} - ${b.ten_chi_nhanh}</option>`).join('');
+    });
+  }
+
+  async function loadFromSupabase(){
+    const {data:branches,error:bErr}=await supabase.from('chi_nhanh').select('id,ma_chi_nhanh,ten_chi_nhanh').eq('dang_hoat_dong',true).order('thu_tu_hien_thi');
+    if(bErr) throw bErr;
+    populateBranches(branches);
+
+    const {data:daily,error:dErr}=await supabase.from('v_bao_cao_ngay_chi_tiet').select('*').order('ngay_bao_cao',{ascending:false}).limit(50);
+    if(dErr) throw dErr;
+    document.getElementById('dailyTableBody').innerHTML = daily.map(r=>`<tr>
+      <td><b>${r.ma_chi_nhanh}</b></td><td>${r.ngay_bao_cao||''}</td><td>${r.tong_chenh_lech_do_dn_l15??''}</td>
+      <td>${fmtPct(r.ty_le_hao_hut_nhap_pct)}</td><td>${fmtPct(r.ty_le_hao_hut_be_cong_to_pct)}</td>
+      <td>${fmtPct(r.ty_le_hao_hut_xuat_ban_pct)}</td><td><b>${fmtPct(r.ty_le_hao_hut_tong_hop_pct)}</b></td>
+      <td><span class="badge info">${r.trang_thai||''}</span></td></tr>`).join('');
+    document.getElementById('dailyOverviewBody').innerHTML = daily.slice(0,8).map(r=>`<tr>
+      <td><b>${r.ma_chi_nhanh}</b></td><td>${fmtPct(r.ty_le_hao_hut_nhap_pct)}</td>
+      <td>${fmtPct(r.ty_le_hao_hut_be_cong_to_pct)}</td><td>${fmtPct(r.ty_le_hao_hut_xuat_ban_pct)}</td>
+      <td><b>${fmtPct(r.ty_le_hao_hut_tong_hop_pct)}</b></td><td><span class="badge info">${r.trang_thai||''}</span></td></tr>`).join('');
+
+    const {data:monthly,error:mErr}=await supabase.from('v_bao_cao_thang_chi_tiet').select('*').order('nam',{ascending:false}).order('thang',{ascending:false}).limit(50);
+    if(mErr) throw mErr;
+    document.getElementById('monthlyTableBody').innerHTML = monthly.map(r=>`<tr>
+      <td><b>${r.ma_chi_nhanh}</b></td><td>${String(r.thang).padStart(2,'0')}/${r.nam}</td>
+      <td><span class="badge ${badgeClass(r.trang_thai==='da_gui'?'Đã gửi':'')}">${r.trang_thai}</span></td>
+      <td>V${r.phien_ban_hien_tai}</td><td>${r.ngay_gui?new Date(r.ngay_gui).toLocaleDateString('vi-VN'):'—'}</td>
+      <td>${fmtPct(r.ty_le_hao_hut_nhap_pct)}</td><td>${fmtPct(r.ty_le_hao_hut_be_cong_to_pct)}</td>
+      <td>${fmtPct(r.ty_le_hao_hut_xuat_ban_pct)}</td><td><b>${fmtPct(r.ty_le_hao_hut_tong_hop_pct)}</b></td></tr>`).join('');
+  }
+
+  function fmtPct(v){ return v===null||v===undefined ? '—' : `${Number(v).toFixed(3)}%`; }
+
+  async function uploadDaily(){
+    if(!CONFIGURED) return alert('Chưa cấu hình Supabase.');
+    const branchId=document.getElementById('uploadDailyBranch').value;
+    const file=document.getElementById('dailyFile').files[0];
+    if(!branchId||!file) return alert('Chọn chi nhánh và file.');
+    const today=new Date().toISOString().slice(0,10);
+    const path=`${branchId}/${today}/${Date.now()}_${file.name}`;
+    const {error}=await supabase.storage.from('bao-cao-ngay').upload(path,file);
+    if(error) return alert(error.message);
+    await supabase.from('bao_cao_ngay').upsert({chi_nhanh_id:branchId,ngay_bao_cao:today,trang_thai:'da_tai_file',ten_file_goc:file.name,duong_dan_file:path},{onConflict:'chi_nhanh_id,ngay_bao_cao'});
+    alert('Đã upload file ngày. Bước tiếp theo là module đọc/mapping Excel.');
+  }
+
+  async function uploadMonthly(){
+    if(!CONFIGURED) return alert('Chưa cấu hình Supabase.');
+    const branchId=document.getElementById('uploadMonthlyBranch').value;
+    const period=document.getElementById('uploadMonthlyPeriod').value;
+    const file=document.getElementById('monthlyFile').files[0];
+    if(!branchId||!period||!file) return alert('Chọn chi nhánh, kỳ và file.');
+    const [nam,thang]=period.split('-').map(Number);
+    let {data:report,error:rErr}=await supabase.from('bao_cao_thang').select('*').eq('chi_nhanh_id',branchId).eq('nam',nam).eq('thang',thang).maybeSingle();
+    if(rErr) return alert(rErr.message);
+    if(!report){
+      const ins=await supabase.from('bao_cao_thang').insert({chi_nhanh_id:branchId,nam,thang,trang_thai:'da_gui',ngay_gui:new Date().toISOString(),phien_ban_hien_tai:1}).select().single();
+      if(ins.error) return alert(ins.error.message); report=ins.data;
+    }else{
+      report.phien_ban_hien_tai=(report.phien_ban_hien_tai||0)+1;
+      await supabase.from('bao_cao_thang').update({trang_thai:'da_gui',ngay_gui:new Date().toISOString(),phien_ban_hien_tai:report.phien_ban_hien_tai}).eq('id',report.id);
+    }
+    const path=`${branchId}/${nam}/${String(thang).padStart(2,'0')}/V${report.phien_ban_hien_tai}_${Date.now()}_${file.name}`;
+    const up=await supabase.storage.from('bao-cao-thang').upload(path,file);
+    if(up.error) return alert(up.error.message);
+    await supabase.from('phien_ban_bao_cao_thang').insert({bao_cao_thang_id:report.id,so_phien_ban:report.phien_ban_hien_tai,ten_file:file.name,duong_dan_file:path,kich_thuoc_byte:file.size,la_phien_ban_chinh_thuc:false});
+    alert(`Đã lưu báo cáo tháng V${report.phien_ban_hien_tai}.`);
+  }
+
+  // LOGIN
+  document.getElementById('loginBtn').onclick=()=>document.getElementById('loginModal').classList.add('show');
+  document.getElementById('closeLoginBtn').onclick=()=>document.getElementById('loginModal').classList.remove('show');
+  document.getElementById('doLoginBtn').onclick=async()=>{
+    if(!CONFIGURED) return document.getElementById('loginMessage').textContent='Chưa cấu hình Supabase.';
+    const email=document.getElementById('emailInput').value;
+    const password=document.getElementById('passwordInput').value;
+    const {error}=await supabase.auth.signInWithPassword({email,password});
+    if(error) return document.getElementById('loginMessage').textContent=error.message;
+    document.getElementById('loginModal').classList.remove('show');
+    await init();
+  };
+
+  document.getElementById('uploadDailyBtn').onclick=uploadDaily;
+  document.getElementById('uploadMonthlyBtn').onclick=uploadMonthly;
+
+  async function init(){
+    const d=new Date(); document.getElementById('ngayTongQuan').value=d.toISOString().slice(0,10); document.getElementById('ngayHangNgay').value=d.toISOString().slice(0,10);
+    if(!CONFIGURED){
+      populateBranches(demoBranches); renderDemo(); return;
+    }
+    document.getElementById('configNotice').style.display='none';
+    document.getElementById('connectionBtn').textContent='Supabase đã cấu hình';
+    const {data:{session}}=await supabase.auth.getSession();
+    if(!session){
+      document.getElementById('connectionBtn').textContent='Supabase · Chưa đăng nhập';
+      populateBranches(demoBranches); renderDemo();
+      document.getElementById('loginModal').classList.add('show');
+      return;
+    }
+    document.getElementById('loginBtn').textContent=session.user.email;
+    document.getElementById('connectionBtn').textContent='Supabase · Đã kết nối';
+    try{ await loadFromSupabase(); }
+    catch(e){ console.error(e); alert('Lỗi tải dữ liệu: '+e.message); renderDemo(); }
+  }
+
+  init();
+</script>
+</body>
+</html>
